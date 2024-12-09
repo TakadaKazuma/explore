@@ -6,7 +6,6 @@ import argparse
 def process_and_save_csv(file_path):
     '''
     ファイルのパスを受け取ると、データを加工し新たなcsvファイルを作成する関数
-
     '''
     data = pd.read_csv(file_path, skiprows=1, usecols=[2,3,4,5,6,7,8],
                        names=["LMST", "LTST", "UTC", "p", "p-_FREQUENCY", "p-TEMP", "p-_TEMP_FREQUENCY"], 

@@ -6,16 +6,17 @@ import argparse as argparse
 
 def get_file_path(sol):
     '''
-    指定したsolに対応する、ファイル名を作成する関数
+    指定されたsolに対応する、ファイル名を作成する関数
+    
     sol:探査機到着後からの経過日数(火星日)
     '''
     directory = '/home/takada/2025B_takada/work/git/solall/'
     return os.path.join(directory, f'ps_calib_{str(sol).zfill(4)}.csv')
 
-# データを読み込む関数
 def load_data(file_pass):
     '''
-    指定したcsvファイルを読み込む関数
+    指定されたcsvファイルを読み込む関数
+
     file_pass:読み込むファイルのpass
     '''
     try:
@@ -29,7 +30,8 @@ def load_data(file_pass):
 
 def process_dailydata_p(sol):
     '''
-    指定したsolに対応する、気圧変化の時系列データ(dataframe)を返す関数
+    指定されたsolに対応する、気圧変化の時系列データ(dataframe)を返す関数
+
     sol:探査機到着後からの経過日数(火星日)
     '''
     # sol-1, sol, sol+1に対応するデータ
@@ -55,7 +57,8 @@ def process_dailydata_p(sol):
 
 def process_surround_dailydata(sol):
     '''
-    指定したsolとその前後1日を含む、気圧変化の時系列データ(dataframe)を返す関数
+    指定されたsolとその前後1日を含む、気圧変化の時系列データ(dataframe)を返す関数
+
     sol:探査機到着後からの経過日数(火星日)
     '''
     # sol-1, sol, sol+1に対応する全データ
@@ -76,6 +79,7 @@ def process_surround_dailydata(sol):
 def plot_dailychange_p(sol):
     '''
     指定したsolに対応する、気圧変化の時系列データ(dataframe)の描画を画像として保存する関数
+
     sol:探査機到着後からの経過日数(火星日)
     '''
     try:

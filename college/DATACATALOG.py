@@ -4,6 +4,7 @@ import pandas as pd
 def UTC_to_ls(UTC):
     '''
     UTC(地球地方時)からls(季節を表す指標)を求める関数
+    
     UTC:地球地方時(datetime型)
     '''
     ranges = [
