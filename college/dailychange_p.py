@@ -50,6 +50,28 @@ def process_dailydata_p(sol):
         return dataframe
     else:
         return None
+    
+
+
+def process_surround_dailydata(sol):
+    '''
+    指定したsolとその前後1日を含む、気圧変化の時系列データ(dataframe)を返す関数
+    sol:探査機到着後からの経過日数(火星日)
+    '''
+    # sol-1, sol, sol+1に対応する全データ
+    dataframes = [load_data(get_file_path(sol_offset)) for sol_offset in [sol - 1, sol, sol + 1]]
+    valid_dataframes = [dataframe for dataframe in dataframes if dataframe is not None]
+
+    #結合及び時刻の計算
+    if valid_dataframes:
+        dataframe = pd.concat(valid_dataframes, ignore_index=True)
+        dataframe = dataframe.drop_duplicates(subset=['MUTC'], keep='first')
+        dataframe['Time'] = dataframe['MUTC'].dt.time
+        
+        return dataframe
+    else:
+        return None
+
 
 def plot_dailychange_p(sol):
     '''
