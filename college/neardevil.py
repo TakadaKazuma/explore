@@ -20,8 +20,8 @@ def get_sol_MUTC(ID):
 
 def filter_neardevildata(data, MUTC, time_range, interval):
     '''
-    与えられたdataを「MUTCの(ranges+interval)秒前」~ 「MUTCのinterval秒前」でフィルタリングする関数
-    →与えられたdataをdustdevil発生直前~発生寸前でフィルタリングする関数
+    与えられた時系列データを「MUTCの(time_range+interval)秒前」~ 「MUTCのinterval秒前」の区間で切り取り、そのデータを返す関数(dataframe型)
+    →与えられた時系列データを「dustdevilの発生直前 ~ 発生寸前」までの区間で切り取り、そのデータを返す関数(dataframe型)
 
     data:気圧の時系列データ(dataframe)
     MUTC:dustdevil発生時刻※ 火星地方日時 (datetime型)
@@ -36,7 +36,8 @@ def filter_neardevildata(data, MUTC, time_range, interval):
 
 def caluculate_countdown(data):
     '''
-    フィルタリング済みのデータに事象が発生するまでの秒数を表す「countdown」のカラムを追加したものを返す関数
+    フィルタリング済みの時系列データに最後までの秒数を示す「countdown」のカラムを追加する関数
+    →dustdevil発生寸前までの時間を示す「countdown」のカラムを追加する関数
     ※countdown ≦ 0
 
     data:フィルタリングされた気圧の時系列データ(dataframe)
@@ -50,7 +51,7 @@ def caluculate_countdown(data):
 
 def process_neardevildata(ID, time_range, interval):
     '''
-    IDに対応するdustdevil発生直前~発生寸前における気圧の時系列データ(dataframe)を返す関数
+    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを返す関数
 
     ID:通し番号
     time_range:時間間隔(切り取る時間)(秒)(int型)
@@ -79,10 +80,9 @@ def process_neardevildata(ID, time_range, interval):
         print(f"An error occurred: {e}")
         return None
 
-#IDに対応するダストデビル発生直前～寸前の気圧変化を描画する関数(横軸:カウントダウン)
 def plot_neardevil(ID, time_range, interval):
     '''
-    IDに対応するdustdevil発生直前~発生寸前における気圧の時系列データを描画した画像を保存する関数
+    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを描画した画像を保存する関数
     ※横軸:countdown(s) 縦軸:気圧(Pa)
 
     ID:通し番号
