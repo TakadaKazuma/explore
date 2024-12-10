@@ -8,7 +8,6 @@ import argparse as argparse
 import DATACATALOG
 import dailychange_p
 
-#IDに対応するsol,MUTCを返す関数
 def get_sol_MUTC(ID):
     '''
     ID(通し番号)に対応するsolとMUTCを取得する関数
