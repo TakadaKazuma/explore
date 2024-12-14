@@ -28,7 +28,7 @@ def process_ondevildata(ID, time_range):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生」における気圧の時系列データを返す関数
 
-    ID:通し番号
+    ID:ダストデビルに割り振られた通し番号
     time_range:時間間隔(切り取る時間)(秒)(int型)
     '''
     try:

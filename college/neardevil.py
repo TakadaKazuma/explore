@@ -53,7 +53,7 @@ def process_neardevildata(ID, time_range, interval):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを返す関数
 
-    ID:通し番号
+    ID:ダストデビルに割り振られた通し番号
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
@@ -85,7 +85,7 @@ def plot_neardevil(ID, time_range, interval):
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを描画した画像を保存する関数
     ※横軸:countdown(s) 縦軸:気圧(Pa)
 
-    ID:通し番号
+    ID:ダストデビルに割り振られた通し番号
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''

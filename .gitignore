@@ -1,11 +1,23 @@
+#仮想環境及びプロジェクトフォルダ
+poetry.lock
+
+pyproject.toml
+
+#csvファイルフォルダ
 solall
 
+#分散関係のプロット図
+Dispersion_Relation.png
+
+#DATACATALOG原本
+InSight_CV_Catalog_v3.csv
+
+#画像フォルダ
 dailychange_p
 
 neardevil_*s
 
-InSight_CV_Catalog_v3.csv
+nearFFT_*s
 
-Dispersion_Relation.png
-
+#ログテキストファイル
 Errorlog*.txt
