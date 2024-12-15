@@ -53,8 +53,8 @@ if __name__ == "__main__":
 
     #等高線の描画
     plt.contourf(K, Ω, calculate_n(K, Ω), levels=[0, np.max((K, Ω))], colors=['gray'], alpha=0.5)
-    plt.contour(K, Ω, calculate_AGW_n(K, Ω), levels=[0], colors=['blue'], linestyles='--')
-    plt.contour(K, Ω, calculate_IF_n(K, Ω), levels=[0], colors=['green'], linestyles='--')
+    #plt.contour(K, Ω, calculate_AGW_n(K, Ω), levels=[0], colors=['blue'], linestyles='--')
+    #plt.contour(K, Ω, calculate_IF_n(K, Ω), levels=[0], colors=['green'], linestyles='--')
 
     #境界の描画
     plt.plot(k, k, color='red', linestyle='--')
@@ -64,10 +64,7 @@ if __name__ == "__main__":
 
     #凡例及び軸周り等の各種設定
     plt.legend([
-        plt.Line2D([0], [0], color='red', linestyle='--'),
-        plt.Line2D([0], [0], color='blue', linestyle='--'),
-        plt.Line2D([0], [0], color='green', linestyle='--'),
-    ], [r'$\omega_c$', 'Acoustic Gravity', 'Infrasonic'])
+        plt.Line2D([0], [0], color='red', linestyle='--'),], [r'$\omega_c$'])
     plt.xlabel(r'$k/\gamma$')
     plt.ylabel(r'$\omega/\omega_c$')
     plt.title("Contour Plot of n² Based on Angular Frequency and Wavenumber")
