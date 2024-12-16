@@ -76,3 +76,4 @@ if __name__ == "__main__":
 
     #画像の保存
     plt.savefig("Dispersion_Relation.png")
+    print("Save completed: Dispersion_Relation.png")
