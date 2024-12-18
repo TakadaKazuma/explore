@@ -3,7 +3,8 @@ import pandas as pd
 
 def UTC_to_ls(UTC):
     '''
-    UTC(地球地方時)からls(季節を表す指標)を求める関数
+    UTC(地球地方時)から疑似的なls(季節を表す指標)を求める関数
+    ※ls:0≦ls<30, 30≦ls<60,……, 330≦ls<360の時、疑似的なls:0, 30, ……,330
     
     UTC:地球地方時(datetime型)
     '''

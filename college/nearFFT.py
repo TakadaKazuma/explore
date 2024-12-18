@@ -72,13 +72,13 @@ def process_nearFFTdata(ID, ranges, interval):
         if near_devildata is None:
             raise ValueError("")
         
+        near_devildata = calculate_residual(near_devildata)
         '''
         「countdown」、「p-pred」、「residual」カラムの追加
         countdown:経過時間(秒) ※countdown ≦ 0
         p-pred:線形回帰の結果(気圧(Pa))
         residual:残差
         '''
-        near_devildata = neardevil.caluculate_residual(near_devildata)
         
         #FFTの導出
         fft_x, fft_y = FFT(near_devildata)
@@ -115,7 +115,7 @@ def plot_nearFFT(ID, ranges, interval):
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'FFT_ID={ID}, sol={sol}, time_range={ranges}(s)')
         plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel('Pressure Amplitude')
+        plt.ylabel('Pressure Amplitude [Pa]')
         plt.grid(True)
         plt.tight_layout()
         plt.legend()
