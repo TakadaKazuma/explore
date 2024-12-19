@@ -16,7 +16,7 @@ import nearFFT
 def process_IDlist_ls(ls):
     '''
     lsに対応する疑似的なls(DATACATALOG.py参照)を計算し、
-    datacatalogから疑似的なlsが一致しているIDをリストとして返す関数
+    datacatalogから疑似的なlsが一致しているIDのリストを作成する関数
 
     ls:季節を表す指標
     '''
@@ -78,9 +78,9 @@ def process_arrays(arrays, operation):
 def process_FFTlist_season(ls, time_range, interval):
     '''
     lsに対応する、疑似的なlsが一致している全て事象の時系列データを加工し、
-    求められるFFTをリスト化したものを返す関数
+    求めたFFTをリスト化したものを返す関数
 
-    ls:季節を表す指標
+    ls:季節を表す指標 (int型)
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
@@ -109,15 +109,15 @@ def process_FFTlist_season(ls, time_range, interval):
                 raise ValueError(f"No data:sol={sol}")
             
             near_devildata = nearFFT.caluculate_residual(near_devildata)
-
-            #FFTの導出
-            fft_x, fft_y =  nearFFT.FFT(near_devildata)
             '''
             「countdown」、「p-pred」、「residual」カラムの追加
             countdown:経過時間(秒) ※countdown ≦ 0
             p-pred:線形回帰の結果(気圧(Pa))
             residual:残差
             '''
+
+            #FFTの導出
+            fft_x, fft_y =  nearFFT.FFT(near_devildata)
 
             #記録用配列に追加
             fft_xlist.append(fft_x)
@@ -134,7 +134,7 @@ def plot_meanFFT_season(ls, time_range, interval):
     lsに対応する、疑似的なlsが一致している全て事象の時系列データを加工し、
     求められるFFTをケース平均したものを描画し、保存する関数
 
-    ls:季節を表す指標
+    ls:季節を表す指標 (int型)
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
@@ -165,7 +165,7 @@ def plot_meanFFT_season(ls, time_range, interval):
         plt.tight_layout()
         
         # 保存の設定
-        output_dir = f'meanFFT_season(time_range={time_range}s)'
+        output_dir = f'meanFFT_sortedseason(time_range={time_range}s)'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"meanFFT_ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png"))
         plt.clf()

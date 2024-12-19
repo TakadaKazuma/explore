@@ -19,5 +19,9 @@ neardevil_*s
 
 nearFFT_*s
 
+meanFFT_sortedseason(*
+
+meanFFT_sortedTandWs(*
+
 #ログテキストファイル
 Errorlog*.txt
