@@ -14,34 +14,32 @@ import Dispersion_Relation
 import nearFFT
 import meanFFT_sortedseason
 
-def process_IDlist_TandWs(AT_max, Ws_min):
+def process_IDlist_dP(dP_max):
     '''
-    datacatalogから AT-ave>AT_max かつ Ws-ave<Ws_min を満たすIDのリストを作成する関数
+    datacatalogから dP_max> dP を満たすIDのリストを作成する関数
 
-    AT_max:大気の温度(K) (int型)
-    Ws_ave:平均風速(m/s) (int型)
+    dP_max:基準となる気圧(Pa) (int型)
+    ※dP, dP_max < 0
     '''
     datacatalog = DATACATALOG.process_datacatalog()
-    filtered_list = datacatalog[(datacatalog['AT-ave'] > AT_max)&(datacatalog['Ws-ave'] < Ws_min)]
+    filtered_list = datacatalog[datacatalog['dP'] < dP_max ]
     return filtered_list['ID'].tolist()
 
-
-def process_FFTlist_TandWs(AT_max, Ws_min, ranges, interval):
+def process_FFTlist_dP(dP_max, time_range, interval):
     '''
-    AT-ave>AT_max かつ Ws-ave<Ws_min を満たす全て事象の時系列データを加工し、
-    求めたFFTをリスト化したものを返す関数
+    dP_max > dP を満たす全て事象の時系列データを加工し、
+    求められるFFTをケース平均したものを描画し、保存する関数
 
-    AT_max:大気の温度(K) (int型)
-    Ws_ave:平均風速(m/s) (int型)
+    dP_max:基準となる気圧(Pa) (int型)
+    ※dP, dP_max < 0
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
-
-    #記録用配列の作成
+     #記録用配列の作成
     fft_xlist, fft_ylist = [], []
 
-    #AT-ave>AT_max かつ Ws-ave<Ws_min を満たすIDリストの作成
-    IDlist= process_IDlist_TandWs(AT_max, Ws_min)
+    #dP_max > dP を満たすIDリストの作成
+    IDlist= process_IDlist_dP(dP_max)
     for ID in tqdm(IDlist, desc="Processing IDs"):
         try:
             #IDに対応するsol及びMUTCを取得
@@ -53,20 +51,19 @@ def process_FFTlist_TandWs(AT_max, Ws_min, ranges, interval):
                 raise ValueError("")
             
             #該当範囲の抽出
-            near_devildata = neardevil.filter_neardevildata(data, MUTC, ranges, interval)
+            near_devildata = neardevil.filter_neardevildata(data, MUTC, time_range, interval)
 
             #加工済みデータを1秒でresample
             near_devildata = meanFFT_sortedseason.data_resample(near_devildata, 1)
             if near_devildata is None:
                 raise ValueError("No data")
-
-              
+                
             near_devildata = neardevil.caluculate_residual(near_devildata)
             '''
             「countdown」、「p-pred」、「residual」カラムの追加
             countdown:経過時間(秒) ※countdown ≦ 0
             p-pred:線形回帰の結果(気圧(Pa))
-            residual:残差
+            residual:残差 (Pa)
             '''
 
             #FFTの導出
@@ -82,19 +79,19 @@ def process_FFTlist_TandWs(AT_max, Ws_min, ranges, interval):
             
     return fft_xlist, fft_ylist
 
-def plot_meanFFT_TandWs(T_max, Ws_min, ranges, interval):
+def plot_meanFFT_dP(dP_max, time_range, interval):
     '''
-    AT-ave>AT_max かつ Ws-ave<Ws_min を満たす全て事象の時系列データを加工し、
+    dP_max > dP かつ Ws-ave<Ws_min を満たす全て事象の時系列データを加工し、
     求められるFFTをケース平均したものを描画し、保存する関数
 
-    AT_max:大気の温度(K) (int型)
-    Ws_ave:平均風速(m/s) (int型)
+    dP_max:基準となる気圧(Pa) (int型)
+    ※dP, dP_max < 0
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
     try:
         #対応する全事象のFFTをリスト化したものの導出
-        fft_xlist, fft_ylist = process_FFTlist_TandWs(T_max, Ws_min, ranges, interval)
+        fft_xlist, fft_ylist = process_FFTlist_dP(dP_max, time_range, interval)
         if not fft_xlist or not fft_ylist:
             raise ValueError("No data")
         
@@ -103,7 +100,7 @@ def plot_meanFFT_TandWs(T_max, Ws_min, ranges, interval):
         fft_y = meanFFT_sortedseason.process_arrays(fft_ylist, np.mean)
         
         # 音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_w() / (2 * np.pi)
+        w = Dispersion_Relation.border_Hz()
         
         # プロットの設定
         plt.xscale('log')
@@ -111,7 +108,7 @@ def plot_meanFFT_TandWs(T_max, Ws_min, ranges, interval):
         plt.ylim(1e-8, 1e8)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'T >{T_max},Ws<{Ws_min}(time_range={ranges}(s))')
+        plt.title(f'dP <{dP_max},(time_range={time_range}(s))')
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel('Pressure Amplitude [Pa]')
         plt.grid(True)
@@ -119,12 +116,12 @@ def plot_meanFFT_TandWs(T_max, Ws_min, ranges, interval):
         plt.tight_layout()
         
         # 保存の設定
-        output_dir = f'meanFFT_TandWs(time_range={ranges}s)'
+        output_dir = f'meanFFT_dP(time_range={time_range}s)'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanFFT_T_{T_max}~,Ws_~{Ws_min}~.png"))
+        plt.savefig(os.path.join(output_dir, f"meanFFT_dP_~{dP_max}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanFFT_T_{T_max}~,Ws_~{Ws_min}~.png")
+        print(f"Save completed: meanFFT_dP_~{dP_max}~,(time_range={time_range}(s)).png")
         
         return fft_x, fft_y
 
@@ -132,9 +129,8 @@ def plot_meanFFT_TandWs(T_max, Ws_min, ranges, interval):
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the meanFFT sorted by AT and Ws.")
-    parser.add_argument('AT_max', type=int, help="Maximum value of AT(Atomosphere Tempruture)(Celsius)")
-    parser.add_argument('Ws_min', type=int, help='Minimum value of Ws(Wind speed)(m/s)')
+    parser = argparse.ArgumentParser(description="Plot the meanFFT sorted by dP.")
+    parser.add_argument('dP_max', type=int, help="Maximum value of dP(Pa)(Negative)")
     parser.add_argument('time_range', type=int, help='time_rang(s)')
     args = parser.parse_args()
-    plot_meanFFT_TandWs(args.AT_max, args.Ws_min, args.time_range, 20)
+    plot_meanFFT_dP(args.dP_max, args.time_range, 20)

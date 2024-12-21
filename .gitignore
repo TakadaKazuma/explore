@@ -21,7 +21,9 @@ nearFFT_*s
 
 meanFFT_sortedseason(*
 
-meanFFT_sortedTandWs(*
+meanFFT_sortedATandWs(*
+
+meanFFT_sorteddP(*
 
 #ログテキストファイル
 Errorlog*.txt

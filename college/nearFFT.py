@@ -51,7 +51,7 @@ def FFT(data):
     
     return fft_x, fft_y
 
-def process_nearFFTdata(ID, ranges, interval):
+def process_nearFFTdata(ID, time_range, interval):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、FFTを実行しその結果(各々ndarray)及び対応するsol(int型)を返す関数
@@ -68,11 +68,11 @@ def process_nearFFTdata(ID, ranges, interval):
             raise ValueError("")
         
         #該当範囲の抽出
-        near_devildata = neardevil.filter_neardevildata(data, MUTC, ranges, interval)
+        near_devildata = neardevil.filter_neardevildata(data, MUTC, time_range, interval)
         if near_devildata is None:
             raise ValueError("")
         
-        near_devildata = calculate_residual(near_devildata)
+        near_devildata = neardevil.caluculate_residual(near_devildata)
         '''
         「countdown」、「p-pred」、「residual」カラムの追加
         countdown:経過時間(秒) ※countdown ≦ 0
@@ -90,7 +90,7 @@ def process_nearFFTdata(ID, ranges, interval):
         return None
 
 
-def plot_nearFFT(ID, ranges, interval):
+def plot_nearFFT(ID, time_range, interval):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、FFTを実行し、その結果(スペクトル)を描画する関数
@@ -102,7 +102,7 @@ def plot_nearFFT(ID, ranges, interval):
     '''
     try:
         #FFTの導出
-        fft_x, fft_y, sol = process_nearFFTdata(ID, ranges, interval)
+        fft_x, fft_y, sol = process_nearFFTdata(ID, time_range, interval)
         
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -113,15 +113,15 @@ def plot_nearFFT(ID, ranges, interval):
         plt.ylim(1e-8,1e8)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={ranges}(s)')
+        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={time_range}(s)')
         plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel('Pressure Amplitude [Pa]')
+        plt.ylabel('Pressure Amplitude')
         plt.grid(True)
         plt.tight_layout()
         plt.legend()
         
         #保存の設定
-        output_dir = f'nearFFT_{ranges}s'
+        output_dir = f'nearFFT_{time_range}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_nearFFT.png"))
         plt.clf()
@@ -133,7 +133,7 @@ def plot_nearFFT(ID, ranges, interval):
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
-
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot FFT corresponding to the ID")
     parser.add_argument('ID', type=int, help="ID")

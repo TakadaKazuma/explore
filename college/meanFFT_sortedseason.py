@@ -18,7 +18,7 @@ def process_IDlist_ls(ls):
     lsに対応する疑似的なls(DATACATALOG.py参照)を計算し、
     datacatalogから疑似的なlsが一致しているIDのリストを作成する関数
 
-    ls:季節を表す指標
+    ls:季節を表す指標(int型)
     '''
     datacatalog = DATACATALOG.process_datacatalog()
 
@@ -149,7 +149,7 @@ def plot_meanFFT_season(ls, time_range, interval):
         fft_y = process_arrays(fft_ylist, np.mean)
         
         # 音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_w() / (2 * np.pi)
+        w = Dispersion_Relation.border_Hz()
         
         # プロットの設定
         plt.xscale('log')
@@ -159,7 +159,7 @@ def plot_meanFFT_season(ls, time_range, interval):
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'meanFFT_{LS}≦ ls <{LS+30},(time_range={time_range}(s))')
         plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel('Pressure Amplitude')
+        plt.ylabel('Pressure Amplitude [Pa]')
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
