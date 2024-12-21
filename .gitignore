@@ -19,11 +19,13 @@ neardevil_*s
 
 nearFFT_*s
 
-meanFFT_sortedseason(*
+nearmovingFFT_*s
 
-meanFFT_sortedATandWs(*
+meanFFT_sortedseason_*s
 
-meanFFT_sorteddP(*
+meanFFT_sortedATandWs_*s
+
+meanFFT_sorteddP_*s
 
 #ログテキストファイル
 Errorlog*.txt

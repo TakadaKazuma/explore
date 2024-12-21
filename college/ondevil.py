@@ -9,7 +9,7 @@ import DATACATALOG
 import dailychange_p
 import neardevil
 
-def filter_ondevildata(data, MUTC, time_range):
+def filter_ondevil(data, MUTC, time_range):
     '''
     与えられた時系列データを「MUTCのtime_range秒前」~ 「MUTC」の区間で切り取り、そのデータを返す関数(dataframe型)
     →与えられた時系列データを「dustdevilの発生直前 ~ 発生」までの区間で切り取り、そのデータを返す関数(dataframe型)
@@ -24,7 +24,7 @@ def filter_ondevildata(data, MUTC, time_range):
     
     return filtered_data
 
-def process_ondevildata(ID, time_range):
+def process_ondevil(ID, time_range):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生」における気圧の時系列データを返す関数
 
@@ -41,7 +41,7 @@ def process_ondevildata(ID, time_range):
             raise ValueError("")
         
         #該当時系列データをdustdevil近辺でフィルタリング
-        on_devildata = filter_ondevildata(data, MUTC, time_range)
+        on_devildata = filter_ondevil(data, MUTC, time_range)
         if on_devildata is None:
             raise ValueError("")
         
@@ -61,7 +61,7 @@ def plot_ondevil(ID, time_range):
     '''
     try:
         #描画する時系列データの取得
-        on_devildata, sol = process_ondevildata(ID, time_range)
+        on_devildata, sol = process_ondevil(ID, time_range)
         
         if on_devildata is None:
             raise ValueError(f"No data:sol={sol}")

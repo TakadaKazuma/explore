@@ -14,48 +14,25 @@ import Dispersion_Relation
 import nearFFT
 import meanFFT_sortedseason
 
-def process_IDlist_ATandWs(AT_max, Ws_min):
+def process_IDlist_ATandWs(AT_Llimit, Ws_Ulimit):
     '''
-    datacatalogから AT-ave>AT_max かつ Ws-ave<Ws_min を満たすIDのリストを作成する関数
+    datacatalogから AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たすIDのリストを作成する関数
 
-    AT_max:基準となる大気の温度(K) (int型)
-    Ws_min:基準となる風速(m/s) (int型)
+    AT_Llimit:下限の基準となる大気の温度(K) (int型)
+    Ws_Ulimit:上限の基準となる風速(m/s) (int型)
     '''
     datacatalog = DATACATALOG.process_datacatalog()
-    filtered_list = datacatalog[(datacatalog['AT-ave'] > AT_max)&(datacatalog['Ws-ave'] < Ws_min)]
-    return filtered_list['ID'].tolist()
-
-def process_IDlist_ATandWs(AT_max, Ws_min):
-    '''
-    datacatalogから AT-ave>AT_max かつ Ws-ave<Ws_min を満たすIDのリストを作成する関数
-
-    AT_max:基準となる大気の温度(K) (int型)
-    Ws_min:基準となる風速(m/s) (int型)
-    '''
-    datacatalog = DATACATALOG.process_datacatalog()
-    filtered_list = datacatalog[(datacatalog['AT-ave'] > AT_max)&(datacatalog['Ws-ave'] < Ws_min)]
+    filtered_list = datacatalog[(datacatalog['AT-ave'] > AT_Llimit)&(datacatalog['Ws-ave'] < Ws_Ulimit)]
     return filtered_list['ID'].tolist()
 
 
-def process_IDlist_ATandWs(AT_max, Ws_min):
+def process_FFTlist_ATandWs(AT_Llimit, Ws_Ulimit, time_range, interval):
     '''
-    datacatalogから AT-ave>AT_max かつ Ws-ave<Ws_min を満たすIDのリストを作成する関数
-
-    AT_max:基準となる大気の温度(K) (int型)
-    Ws_min:基準となる風速(m/s) (int型)
-    '''
-    datacatalog = DATACATALOG.process_datacatalog()
-    filtered_list = datacatalog[(datacatalog['AT-ave'] > AT_max)&(datacatalog['Ws-ave'] < Ws_min)]
-    return filtered_list['ID'].tolist()
-
-
-def process_FFTlist_ATandWs(AT_max, Ws_min, time_range, interval):
-    '''
-    AT-ave>AT_max かつ Ws-ave<Ws_min を満たす全て事象の時系列データを加工し、
+    AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たす全て事象の時系列データを加工し、
     求めたFFTをリスト化したものを返す関数
 
-    AT_max:基準となる大気の温度(K) (int型)
-    Ws_min:基準となる風速(m/s) (int型)
+    AT_Llimit:下限の基準となる大気の温度(K) (int型)
+    Ws_Ulimit:上限の基準となる風速(m/s) (int型)
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
@@ -63,8 +40,8 @@ def process_FFTlist_ATandWs(AT_max, Ws_min, time_range, interval):
     #記録用配列の作成
     fft_xlist, fft_ylist = [], []
 
-    #AT-ave>AT_max かつ Ws-ave<Ws_min を満たすIDリストの作成
-    IDlist= process_IDlist_ATandWs(AT_max, Ws_min)
+    #AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たすIDリストの作成
+    IDlist= process_IDlist_ATandWs(AT_Llimit, Ws_Ulimit)
     for ID in tqdm(IDlist, desc="Processing IDs"):
         try:
             #IDに対応するsol及びMUTCを取得
@@ -105,19 +82,19 @@ def process_FFTlist_ATandWs(AT_max, Ws_min, time_range, interval):
             
     return fft_xlist, fft_ylist
 
-def plot_meanFFT_ATandWs(AT_max, Ws_min, time_range, interval):
+def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, time_range, interval):
     '''
-    AT-ave>AT_max かつ Ws-ave<Ws_min を満たす全て事象の時系列データを加工し、
+    AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たす全て事象の時系列データを加工し、
     求められるFFTをケース平均したものを描画し、保存する関数
 
-    AT_max:基準となる大気の温度(K) (int型)
-    Ws_min:基準となる風速(m/s) (int型)
+    AT_Llimit:下限の基準となる大気の温度(K) (int型)
+    Ws_Ulimit:上限の基準となる風速(m/s) (int型)
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
     try:
         #対応する全事象のFFTをリスト化したものの導出
-        fft_xlist, fft_ylist = process_FFTlist_ATandWs(AT_max, Ws_min, time_range, interval)
+        fft_xlist, fft_ylist = process_FFTlist_ATandWs(AT_Llimit, Ws_Ulimit, time_range, interval)
         if not fft_xlist or not fft_ylist:
             raise ValueError("No data")
         
@@ -134,7 +111,7 @@ def plot_meanFFT_ATandWs(AT_max, Ws_min, time_range, interval):
         plt.ylim(1e-8, 1e8)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'AT >{AT_max},Ws<{Ws_min}(time_range={time_range}(s))')
+        plt.title(f'AT >{AT_Llimit},Ws<{Ws_Ulimit}(time_range={time_range}(s))')
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel('Pressure Amplitude [Pa]')
         plt.grid(True)
@@ -144,10 +121,10 @@ def plot_meanFFT_ATandWs(AT_max, Ws_min, time_range, interval):
         # 保存の設定
         output_dir = f'meanFFT_ATandWs(time_range={time_range}s)'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanFFT_AT_{AT_max}~,Ws_~{Ws_min}~.png"))
+        plt.savefig(os.path.join(output_dir, f"meanFFT_AT_{AT_Llimit}~,Ws_~{Ws_Ulimit}~.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanFFT_AT_{AT_max}~,Ws_~{Ws_min}~.png")
+        print(f"Save completed: meanFFT_AT_{AT_Llimit}~,Ws_~{Ws_Ulimit}~.png")
         
         return fft_x, fft_y
 
@@ -155,9 +132,9 @@ def plot_meanFFT_ATandWs(AT_max, Ws_min, time_range, interval):
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the meanFFT sorted by AT and Ws.")
-    parser.add_argument('AT_max', type=int, help="Maximum value of AT(Atomosphere Tempruture)(Celsius)")
-    parser.add_argument('Ws_min', type=int, help='Minimum value of Ws(Wind speed)(m/s)')
+    parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the AT_Ulimit and Ws_Llimit")
+    parser.add_argument('AT_Ulimit', type=int, help="Serves as the standard for the upper limit of AT_ave(K)")
+    parser.add_argument('Ws_Llimit', type=int, help='Serves as the standard for the upper limit of Ws_ave(m/s)')
     parser.add_argument('time_range', type=int, help='time_rang(s)')
     args = parser.parse_args()
-    plot_meanFFT_ATandWs(args.AT_max, args.Ws_min, args.time_range, 20)
+    plot_meanFFT_ATandWs(args.AT_Ulimit, args.Ws_Llimit, args.time_range, 20)

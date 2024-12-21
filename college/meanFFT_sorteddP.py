@@ -14,23 +14,23 @@ import Dispersion_Relation
 import nearFFT
 import meanFFT_sortedseason
 
-def process_IDlist_dP(dP_max):
+def process_IDlist_dP(dP_Ulimit):
     '''
     datacatalogから dP_max> dP を満たすIDのリストを作成する関数
 
-    dP_max:基準となる気圧(Pa) (int型)
+    dP_Ulimit:上限となる気圧効果量(Pa) (int型)
     ※dP, dP_max < 0
     '''
     datacatalog = DATACATALOG.process_datacatalog()
-    filtered_list = datacatalog[datacatalog['dP'] < dP_max ]
+    filtered_list = datacatalog[datacatalog['dP'] < dP_Ulimit ]
     return filtered_list['ID'].tolist()
 
-def process_FFTlist_dP(dP_max, time_range, interval):
+def process_FFTlist_dP(dP_Ulimit, time_range, interval):
     '''
     dP_max > dP を満たす全て事象の時系列データを加工し、
-    求められるFFTをケース平均したものを描画し、保存する関数
+    FFTを用いて導出したパワースペクトルをリスト化したものを返す関数
 
-    dP_max:基準となる気圧(Pa) (int型)
+    dP_max:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_max < 0
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
@@ -39,7 +39,7 @@ def process_FFTlist_dP(dP_max, time_range, interval):
     fft_xlist, fft_ylist = [], []
 
     #dP_max > dP を満たすIDリストの作成
-    IDlist= process_IDlist_dP(dP_max)
+    IDlist= process_IDlist_dP(dP_Ulimit)
     for ID in tqdm(IDlist, desc="Processing IDs"):
         try:
             #IDに対応するsol及びMUTCを取得
@@ -66,7 +66,7 @@ def process_FFTlist_dP(dP_max, time_range, interval):
             residual:残差 (Pa)
             '''
 
-            #FFTの導出
+            #パワースペクトルの導出
             fft_x, fft_y =  nearFFT.FFT(near_devildata)
 
             #記録用配列に追加
@@ -79,23 +79,24 @@ def process_FFTlist_dP(dP_max, time_range, interval):
             
     return fft_xlist, fft_ylist
 
-def plot_meanFFT_dP(dP_max, time_range, interval):
+def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
     '''
     dP_max > dP かつ Ws-ave<Ws_min を満たす全て事象の時系列データを加工し、
-    求められるFFTをケース平均したものを描画し、保存する関数
+    FFTを用いて導出したパワースペクトルをケース平均し、それの描画及び保存を行う関数
+    横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
-    dP_max:基準となる気圧(Pa) (int型)
+    dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_max < 0
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
     try:
-        #対応する全事象のFFTをリスト化したものの導出
-        fft_xlist, fft_ylist = process_FFTlist_dP(dP_max, time_range, interval)
+        #対応する全事象のパワースペクトルをリスト化したものの導出
+        fft_xlist, fft_ylist = process_FFTlist_dP(dP_Ulimit, time_range, interval)
         if not fft_xlist or not fft_ylist:
             raise ValueError("No data")
         
-        # FFTのケース平均を導出
+        #パワースペクトルのケース平均を導出
         fft_x = meanFFT_sortedseason.process_arrays(fft_xlist, np.mean)
         fft_y = meanFFT_sortedseason.process_arrays(fft_ylist, np.mean)
         
@@ -108,20 +109,20 @@ def plot_meanFFT_dP(dP_max, time_range, interval):
         plt.ylim(1e-8, 1e8)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'dP <{dP_max},(time_range={time_range}(s))')
+        plt.title(f'dP <{dP_Ulimit}.timerange={time_range}s')
         plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel('Pressure Amplitude [Pa]')
+        plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
         
         # 保存の設定
-        output_dir = f'meanFFT_dP(time_range={time_range}s)'
+        output_dir = f'meanFFT_dP_{time_range}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanFFT_dP_~{dP_max}.png"))
+        plt.savefig(os.path.join(output_dir, f"meanFFT_dP_~{dP_Ulimit}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanFFT_dP_~{dP_max}~,(time_range={time_range}(s)).png")
+        print(f"Save completed: meanFFT_dP_~{dP_Ulimit}.png")
         
         return fft_x, fft_y
 
@@ -129,8 +130,8 @@ def plot_meanFFT_dP(dP_max, time_range, interval):
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the meanFFT sorted by dP.")
-    parser.add_argument('dP_max', type=int, help="Maximum value of dP(Pa)(Negative)")
+    parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the dP_Ulimit")
+    parser.add_argument('dP_Ulimit', type=int, help="Serves as the standard for the upper limit of dP(Negative int)")
     parser.add_argument('time_range', type=int, help='time_rang(s)')
     args = parser.parse_args()
     plot_meanFFT_dP(args.dP_max, args.time_range, 20)

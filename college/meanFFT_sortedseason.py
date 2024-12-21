@@ -78,7 +78,7 @@ def process_arrays(arrays, operation):
 def process_FFTlist_season(ls, time_range, interval):
     '''
     lsに対応する、疑似的なlsが一致している全て事象の時系列データを加工し、
-    求めたFFTをリスト化したものを返す関数
+    FFTを用いて導出したパワースペクトルをリスト化したものを返す関数
 
     ls:季節を表す指標 (int型)
     time_range:時間間隔(切り取る時間)(秒)(int型)
@@ -116,7 +116,7 @@ def process_FFTlist_season(ls, time_range, interval):
             residual:残差
             '''
 
-            #FFTの導出
+            #パワースペクトルの導出
             fft_x, fft_y =  nearFFT.FFT(near_devildata)
 
             #記録用配列に追加
@@ -132,19 +132,20 @@ def process_FFTlist_season(ls, time_range, interval):
 def plot_meanFFT_season(ls, time_range, interval):
     '''
     lsに対応する、疑似的なlsが一致している全て事象の時系列データを加工し、
-    求められるFFTをケース平均したものを描画し、保存する関数
+    FFTを用いて導出したパワースペクトルをケース平均し、それの描画及び保存を行う関数
+    横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     ls:季節を表す指標 (int型)
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
     try:
-        #対応する全事象のFFTをリスト化したものの導出
+        #対応する全事象のパワースペクトルをリスト化したものの導出
         fft_xlist, fft_ylist, LS = process_FFTlist_season(ls, time_range, interval)
         if not fft_xlist or not fft_ylist:
             raise ValueError(f"No data: ls={ls}")
         
-        # FFTのケース平均を導出
+        # パワースペクトルのケース平均を導出
         fft_x = process_arrays(fft_xlist, np.mean)
         fft_y = process_arrays(fft_ylist, np.mean)
         
@@ -157,15 +158,15 @@ def plot_meanFFT_season(ls, time_range, interval):
         plt.ylim(1e-8, 1e8)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'meanFFT_{LS}≦ ls <{LS+30},(time_range={time_range}(s))')
+        plt.title(f'meanFFT_{LS}≦ ls <{LS+30},time_range={time_range}s')
         plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel('Pressure Amplitude [Pa]')
+        plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
         
         # 保存の設定
-        output_dir = f'meanFFT_sortedseason(time_range={time_range}s)'
+        output_dir = f'meanFFT_sortedseason_{time_range}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"meanFFT_ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png"))
         plt.clf()
@@ -178,7 +179,7 @@ def plot_meanFFT_season(ls, time_range, interval):
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot meanFFT corresponding to the ls")
+    parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the ls")
     parser.add_argument('ls', type=int, help="ls(season)")
     parser.add_argument('time_range', type=int, help='time_rang(s)')
     args = parser.parse_args()
