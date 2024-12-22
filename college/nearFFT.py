@@ -21,7 +21,7 @@ def calculate_residual(data):
     new_data = data.copy()
 
     #経過時間(秒)の計算及びcountdownカラムの追加
-    new_data = neardevil.caluculate_countdown(new_data)
+    new_data = neardevil.calculate_countdown(new_data)
 
     #p及びcountdownカラムにNanのある行を削除
     new_data = new_data.dropna(subset=['p', 'countdown'])
@@ -75,7 +75,7 @@ def process_nearFFT(ID, time_range, interval):
         if near_devildata is None:
             raise ValueError("")
         
-        near_devildata = neardevil.caluculate_residual(near_devildata)
+        near_devildata = calculate_residual(near_devildata)
         '''
         「countdown」、「p-pred」、「residual」カラムの追加
         countdown:経過時間(秒) ※countdown ≦ 0
@@ -139,7 +139,7 @@ def plot_nearFFT(ID, time_range, interval):
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot Power Spectrum corresponding to the ID")
-    parser.add_argument('ID', type=int, help="ID")
-    parser.add_argument('time_range', type=int, help='time_rang(s)')
+    parser.add_argument('ID', type=int, help="ID") #IDの指定
+    parser.add_argument('time_range', type=int, help='time_rang(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
     plot_nearFFT(args.ID, args.time_range, 20)

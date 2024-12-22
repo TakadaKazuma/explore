@@ -33,15 +33,15 @@ def process_FFTlist_ATandWs(AT_Llimit, Ws_Ulimit, time_range, interval):
 
     AT_Llimit:下限の基準となる大気の温度(K) (int型)
     Ws_Ulimit:上限の基準となる風速(m/s) (int型)
-    time_range:時間間隔(切り取る時間)(秒)(int型)
-    interval:ラグ(何秒前から切り取るか)(秒)(int型)
+    time_range:時間間隔(切り出す時間)(秒)(int型)
+    interval:ラグ(何秒前から切り出すか)(秒)(int型)
     '''
 
     #記録用配列の作成
     fft_xlist, fft_ylist = [], []
 
     #AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たすIDリストの作成
-    IDlist= process_IDlist_ATandWs(AT_Llimit, Ws_Ulimit)
+    IDlist = process_IDlist_ATandWs(AT_Llimit, Ws_Ulimit)
     for ID in tqdm(IDlist, desc="Processing IDs"):
         try:
             #IDに対応するsol及びMUTCを取得
@@ -61,7 +61,7 @@ def process_FFTlist_ATandWs(AT_Llimit, Ws_Ulimit, time_range, interval):
                 raise ValueError("No data")
 
               
-            near_devildata = neardevil.caluculate_residual(near_devildata)
+            near_devildata = nearFFT.calculate_residual(near_devildata)
             '''
             「countdown」、「p-pred」、「residual」カラムの追加
             countdown:経過時間(秒) ※countdown ≦ 0
@@ -89,8 +89,8 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, time_range, interval):
 
     AT_Llimit:下限の基準となる大気の温度(K) (int型)
     Ws_Ulimit:上限の基準となる風速(m/s) (int型)
-    time_range:時間間隔(切り取る時間)(秒)(int型)
-    interval:ラグ(何秒前から切り取るか)(秒)(int型)
+    time_range:時間間隔(切り出す時間)(秒)(int型)
+    interval:ラグ(何秒前から切り出すか)(秒)(int型)
     '''
     try:
         #対応する全事象のFFTをリスト化したものの導出
@@ -133,8 +133,8 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, time_range, interval):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the AT_Ulimit and Ws_Llimit")
-    parser.add_argument('AT_Ulimit', type=int, help="Serves as the standard for the upper limit of AT_ave(K)")
-    parser.add_argument('Ws_Llimit', type=int, help='Serves as the standard for the upper limit of Ws_ave(m/s)')
-    parser.add_argument('time_range', type=int, help='time_rang(s)')
+    parser.add_argument('AT_Ulimit', type=int, help="Serves as the standard for the upper limit of AT_ave(K)") #AT_aveの上限の指定
+    parser.add_argument('Ws_Llimit', type=int, help='Serves as the standard for the upper limit of Ws_ave(m/s)') #Ws_aveの下限の指定
+    parser.add_argument('time_range', type=int, help='time_rang(s)') #時間範囲(切り出す時間)の指定
     args = parser.parse_args()
     plot_meanFFT_ATandWs(args.AT_Ulimit, args.Ws_Llimit, args.time_range, 20)

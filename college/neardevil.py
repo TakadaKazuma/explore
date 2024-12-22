@@ -34,7 +34,7 @@ def filter_neardevildata(data, MUTC, time_range, interval):
     
     return filtered_data
 
-def caluculate_countdown(data):
+def calculate_countdown(data):
     '''
     フィルタリング済みの時系列データに最後までの秒数を示す「countdown」のカラムを追加する関数
     →dustdevil発生寸前までの時間を示す「countdown」のカラムを追加する関数
@@ -72,7 +72,7 @@ def process_neardevildata(ID, time_range, interval):
             raise ValueError("")
         
         #「countdown」カラムの追加
-        near_devildata = caluculate_countdown(near_devildata)
+        near_devildata = calculate_countdown(near_devildata)
         
         return near_devildata, sol
     
@@ -120,7 +120,7 @@ def plot_neardevil(ID, time_range, interval):
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot pressure changes corresponding to the ID")
-    parser.add_argument('ID', type=int, help="ID")
-    parser.add_argument('time_range', type=int, help='time_range(s)')
+    parser.add_argument('ID', type=int, help="ID") #IDの指定
+    parser.add_argument('time_range', type=int, help='time_range(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
     plot_neardevil(args.ID, args.time_range, 20)

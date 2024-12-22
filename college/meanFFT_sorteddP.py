@@ -32,14 +32,14 @@ def process_FFTlist_dP(dP_Ulimit, time_range, interval):
 
     dP_max:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_max < 0
-    time_range:時間間隔(切り取る時間)(秒)(int型)
-    interval:ラグ(何秒前から切り取るか)(秒)(int型)
+    time_range:時間間隔(切り出す時間)(秒)(int型)
+    interval:ラグ(何秒前から切り出すか)(秒)(int型)
     '''
      #記録用配列の作成
     fft_xlist, fft_ylist = [], []
 
     #dP_max > dP を満たすIDリストの作成
-    IDlist= process_IDlist_dP(dP_Ulimit)
+    IDlist = process_IDlist_dP(dP_Ulimit)
     for ID in tqdm(IDlist, desc="Processing IDs"):
         try:
             #IDに対応するsol及びMUTCを取得
@@ -58,7 +58,7 @@ def process_FFTlist_dP(dP_Ulimit, time_range, interval):
             if near_devildata is None:
                 raise ValueError("No data")
                 
-            near_devildata = neardevil.caluculate_residual(near_devildata)
+            near_devildata = nearFFT.calculate_residual(near_devildata)
             '''
             「countdown」、「p-pred」、「residual」カラムの追加
             countdown:経過時間(秒) ※countdown ≦ 0
@@ -87,8 +87,8 @@ def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_max < 0
-    time_range:時間間隔(切り取る時間)(秒)(int型)
-    interval:ラグ(何秒前から切り取るか)(秒)(int型)
+    time_range:時間間隔(切り出す時間)(秒)(int型)
+    interval:ラグ(何秒前から切り出すか)(秒)(int型)
     '''
     try:
         #対応する全事象のパワースペクトルをリスト化したものの導出
@@ -130,8 +130,8 @@ def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the dP_Ulimit")
-    parser.add_argument('dP_Ulimit', type=int, help="Serves as the standard for the upper limit of dP(Negative int)")
-    parser.add_argument('time_range', type=int, help='time_rang(s)')
+    parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the dP_Ulimit") 
+    parser.add_argument('dP_Ulimit', type=int, help="Serves as the standard for the upper limit of dP_ave(Negative int)") #dP_aveの上限の指定(負)
+    parser.add_argument('time_range', type=int, help='time_rang(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
-    plot_meanFFT_dP(args.dP_max, args.time_range, 20)
+    plot_meanFFT_dP(args.dP_Ulimit, args.time_range, 20)

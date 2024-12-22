@@ -41,8 +41,8 @@ def process_movingFFT(ID, time_range, interval, window_size):
     その結果(各々ndarray)及び対応するsol(int型)を返す関数
 
     ID:ダストデビルに割り振られた通し番号
-    time_range:時間間隔(切り取る時間)(秒)(int型)
-    interval:ラグ(何秒前から切り取るか)(秒)(int型)
+    time_range:時間間隔(切り出す時間)(秒)(int型)
+    interval:ラグ(何秒前から切り出すか)(秒)(int型)
     window_size:移動平均を計算する際の窓数(int型)
     '''
     try:
@@ -59,7 +59,7 @@ def process_movingFFT(ID, time_range, interval, window_size):
         if near_devildata is None:
             raise ValueError("")
         
-        near_devildata = neardevil.caluculate_residual(near_devildata)
+        near_devildata = nearFFT.calculate_residual(near_devildata)
         '''
         「countdown」、「p-pred」、「residual」カラムの追加
         countdown:経過時間(秒) ※countdown ≦ 0
@@ -76,7 +76,6 @@ def process_movingFFT(ID, time_range, interval, window_size):
         print(f"An error occurred: {e}")
         return None
 
-
 def plot_movingFFT(ID, time_range, interval, window_size):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
@@ -84,8 +83,8 @@ def plot_movingFFT(ID, time_range, interval, window_size):
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     ID:ダストデビルに割り振られた通し番号
-    time_range:時間間隔(切り取る時間)(秒)(int型)
-    interval:ラグ(何秒前から切り取るか)(秒)(int型)
+    time_range:時間間隔(切り出す時間)(秒)(int型)
+    interval:ラグ(何秒前から切り出すか)(秒)(int型)
     window_size:移動平均を計算する際の窓数(int型)
 
     '''
@@ -124,8 +123,8 @@ def plot_movingFFT(ID, time_range, interval, window_size):
         return None
     
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot Power Spectrum corresponding to the ID")
-    parser.add_argument('ID', type=int, help="ID") 
-    parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average")
+    parser = argparse.ArgumentParser(description="Plot pressure changes corresponding to the ID")
+    parser.add_argument('ID', type=int, help="ID") #IDの指定
+    parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average") #窓数の指定
     args = parser.parse_args()
     plot_movingFFT(args.ID, 7200, 20, args.windowsize)

@@ -108,7 +108,7 @@ def process_FFTlist_season(ls, time_range, interval):
             if near_devildata is None:
                 raise ValueError(f"No data:sol={sol}")
             
-            near_devildata = nearFFT.caluculate_residual(near_devildata)
+            near_devildata = nearFFT.calculate_residual(near_devildata)
             '''
             「countdown」、「p-pred」、「residual」カラムの追加
             countdown:経過時間(秒) ※countdown ≦ 0
@@ -180,7 +180,7 @@ def plot_meanFFT_season(ls, time_range, interval):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the ls")
-    parser.add_argument('ls', type=int, help="ls(season)")
-    parser.add_argument('time_range', type=int, help='time_rang(s)')
+    parser.add_argument('ls', type=int, help="ls(season)") #疑似的なlsの指定
+    parser.add_argument('time_range', type=int, help='time_rang(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
     plot_meanFFT_season(args.ls, args.time_range, 20)

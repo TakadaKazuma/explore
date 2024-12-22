@@ -90,7 +90,7 @@ def plot_ondevil(ID, time_range):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot pressure changes corresponding to the ID")
-    parser.add_argument('ID', type=int, help="ID")
-    parser.add_argument('time_range', type=int, help='time_range(s)')
+    parser.add_argument('ID', type=int, help="ID") #IDの指定
+    parser.add_argument('time_range', type=int, help='time_range(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
     plot_ondevil(args.ID, args.time_range)
