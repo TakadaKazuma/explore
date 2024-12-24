@@ -103,8 +103,8 @@ def process_FFTlist_season(ls, time_range, interval):
             #該当範囲の抽出
             near_devildata = neardevil.filter_neardevildata(data, MUTC, time_range, interval)
 
-            #加工済みデータを1秒でresample
-            near_devildata = data_resample(near_devildata, 1)
+            #加工済みデータを0.5秒でresample
+            near_devildata = data_resample(near_devildata, 0.5)
             if near_devildata is None:
                 raise ValueError(f"No data:sol={sol}")
             

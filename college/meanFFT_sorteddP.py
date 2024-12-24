@@ -53,8 +53,8 @@ def process_FFTlist_dP(dP_Ulimit, time_range, interval):
             #該当範囲の抽出
             near_devildata = neardevil.filter_neardevildata(data, MUTC, time_range, interval)
 
-            #加工済みデータを1秒でresample
-            near_devildata = meanFFT_sortedseason.data_resample(near_devildata, 1)
+            #加工済みデータを0.5秒でresample
+            near_devildata = meanFFT_sortedseason.data_resample(near_devildata, 0.5)
             if near_devildata is None:
                 raise ValueError("No data")
                 
@@ -81,7 +81,7 @@ def process_FFTlist_dP(dP_Ulimit, time_range, interval):
 
 def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
     '''
-    dP_max > dP かつ Ws-ave<Ws_min を満たす全て事象の時系列データを加工し、
+    dP_max > dP を満たす全て事象の時系列データを加工し、
     FFTを用いて導出したパワースペクトルをケース平均し、それの描画及び保存を行う関数
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
