@@ -27,5 +27,7 @@ meanFFT_sortedATandWs_*s
 
 meanFFT_sorteddP_*s
 
+meanmovingFFT_sorteddP_*s
+
 #ログテキストファイル
 Errorlog*.txt
