@@ -27,10 +27,22 @@ def moving_FFT(data, window_size):
     
     '''
     以下ではパワースペクトルの移動平均を導出
+    ※fft_x及びfft_yの各要素及び長さは、それ自体に意味があるため、
+    ケース平均した際に問題ないように、正確な移動平均の値が計算できない要素には、
+    nanを代入し、長さを維持するようにしている。
     '''
     filter_frame = np.ones(window_size) / window_size
-    moving_fft_x = np.convolve(fft_x, filter_frame, mode="valid")
-    moving_fft_y = np.convolve(fft_y, filter_frame, mode="valid")    
+
+    #窓数に対応する、片側において移動平均をできない要素の数
+    pad_size = (window_size - 1) // 2
+    
+    #fft_x及びfft_yの要素数に統一したndarray(要素は全てnan)を作成
+    moving_fft_x = np.ones(fft_x.shape)*np.nan
+    moving_fft_y = np.ones(fft_y.shape)*np.nan
+    
+    #移動平均を計算できる範囲のみ、その値に変更
+    moving_fft_x[pad_size:-pad_size] = np.convolve(fft_x, filter_frame, mode="valid")
+    moving_fft_y[pad_size:-pad_size] = np.convolve(fft_y, filter_frame, mode="valid")   
     
     return fft_x, fft_y ,moving_fft_x, moving_fft_y
 
