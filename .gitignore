@@ -19,7 +19,9 @@ neardevil_*s
 
 nearFFT_*s
 
-nearmovingFFT_*s_windowsize_*
+nearmovingFFT_*s_windowsize*
+
+nearmovingratio_*s_windowsize*
 
 meanFFT_sortedseason_*s
 
