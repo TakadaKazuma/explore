@@ -19,7 +19,7 @@ neardevil_*s
 
 nearFFT_*s
 
-nearmovingFFT_*s
+nearmovingFFT_*s_windowsize_*
 
 meanFFT_sortedseason_*s
 
@@ -27,7 +27,7 @@ meanFFT_sortedATandWs_*s
 
 meanFFT_sorteddP_*s
 
-meanmovingFFT_sorteddP_*s
+meanmovingFFT_dP_*s
 
 #ログテキストファイル
 Errorlog*.txt

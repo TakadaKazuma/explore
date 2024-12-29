@@ -145,10 +145,10 @@ def plot_meanmovingFFT_dP(dP_Ulimit, time_range, interval, window_size):
         # 保存の設定
         output_dir = f'meanmovingFFT_dP_{time_range}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanmovingFFT_dP_~{dP_Ulimit}.png"))
+        plt.savefig(os.path.join(output_dir, f"meanmovingFFT_dP_~{dP_Ulimit}_windowsize={window_size}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanmovingFFT_dP_~{dP_Ulimit}.png")
+        print(f"Save completed: meanmovingFFT_dP_~{dP_Ulimit}_windowsize={window_size}.png")
         
         return moving_fft_x, moving_fft_y
 
