@@ -13,6 +13,7 @@ import neardevil
 import Dispersion_Relation
 import nearFFT
 import meanFFT_sortedseason
+import meanmovingFFT_sorteddP
 
 def process_IDlist_dP(dP_Ulimit):
     '''
@@ -97,8 +98,8 @@ def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
             raise ValueError("No data")
         
         #パワースペクトルのケース平均を導出
-        fft_x = meanFFT_sortedseason.process_arrays(fft_xlist, np.mean)
-        fft_y = meanFFT_sortedseason.process_arrays(fft_ylist, np.mean)
+        fft_x = meanmovingFFT_sorteddP.process_arrays_with_nan(fft_xlist, np.mean)
+        fft_y = meanmovingFFT_sorteddP.process_arrays_with_nan(fft_ylist, np.mean)
         
         # 音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
