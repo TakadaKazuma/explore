@@ -16,7 +16,7 @@ import meanFFT_sortedseason
 
 def process_IDlist_dP(dP_Ulimit):
     '''
-    datacatalogから dP_max> dP を満たすIDのリストを作成する関数
+    datacatalogから dP_Ulimit> dP を満たすIDのリストを作成する関数
 
     dP_Ulimit:上限となる気圧効果量(Pa) (int型)
     ※dP, dP_max < 0
@@ -27,18 +27,18 @@ def process_IDlist_dP(dP_Ulimit):
 
 def process_FFTlist_dP(dP_Ulimit, time_range, interval):
     '''
-    dP_max > dP を満たす全て事象の時系列データを加工し、
+    dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
     FFTを用いて導出したパワースペクトルをリスト化したものを返す関数
 
-    dP_max:上限となる気圧降下量(Pa) (int型)
-    ※dP, dP_max < 0
+    dP_Ulimit:上限となる気圧降下量(Pa) (int型)
+    ※dP, dP_Ulimit < 0
     time_range:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
     '''
      #記録用配列の作成
     fft_xlist, fft_ylist = [], []
 
-    #dP_max > dP を満たすIDリストの作成
+    #dP_Ulimit > dP を満たすIDリストの作成
     IDlist = process_IDlist_dP(dP_Ulimit)
     for ID in tqdm(IDlist, desc="Processing IDs"):
         try:
@@ -81,12 +81,12 @@ def process_FFTlist_dP(dP_Ulimit, time_range, interval):
 
 def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
     '''
-    dP_max > dP を満たす全て事象の時系列データを加工し、
+    dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
     FFTを用いて導出したパワースペクトルをケース平均し、それの描画及び保存を行う関数
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
-    ※dP, dP_max < 0
+    ※dP, dP_Ulimit < 0
     time_range:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
     '''
@@ -131,7 +131,7 @@ def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the dP_Ulimit") 
-    parser.add_argument('dP_Ulimit', type=int, help="Serves as the standard for the upper limit of dP_ave(Negative int)") #dP_aveの上限の指定(負)
+    parser.add_argument('dP_Ulimit', type=int, help="Serves as the standard for the upper limit of dP_ave(Negative int)") #dPの上限の指定(負)
     parser.add_argument('time_range', type=int, help='time_rang(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
     plot_meanFFT_dP(args.dP_Ulimit, args.time_range, 20)
