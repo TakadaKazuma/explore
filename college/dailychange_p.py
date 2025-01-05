@@ -78,7 +78,7 @@ def process_surround_dailydata(sol):
 
 def plot_dailychange_p(sol):
     '''
-    指定したsolに対応する、気圧変化の時系列データ(dataframe)の描画を画像として保存する関数
+    指定したsolに対応する、気圧変化の時系列データ(dataframe)の描画した画像を保存する関数
 
     sol:探査機到着後からの経過日数(火星日)
     '''

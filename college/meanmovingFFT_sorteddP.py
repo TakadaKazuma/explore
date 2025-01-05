@@ -42,7 +42,7 @@ def process_arrays_with_nan(arrays, operation):
             result.append(operation(values))
     return result
 
-def process_movingFFTlist_dP(dP_Ulimit, time_range, interval, window_size):
+def process_movingFFTlist_dP(dP_Ulimit, time_range, interval, windowsize):
     '''
     dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
     FFTを用いて導出したパワースペクトルとその移動平均をリスト化したものを返す関数
@@ -51,7 +51,7 @@ def process_movingFFTlist_dP(dP_Ulimit, time_range, interval, window_size):
     ※dP, dP_Ulimit < 0
     time_range:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    window_size:移動平均を計算する際の窓数(int型)
+    window_size:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     #記録用配列の作成
     fft_xlist, fft_ylist = [], []
@@ -87,7 +87,7 @@ def process_movingFFTlist_dP(dP_Ulimit, time_range, interval, window_size):
                 raise ValueError("No data")
                 
             #パワースペクトルとその移動平均の導出
-            fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, window_size)
+            fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, windowsize)
             
             #記録用配列に保存
             fft_xlist.append(fft_x)
@@ -101,21 +101,21 @@ def process_movingFFTlist_dP(dP_Ulimit, time_range, interval, window_size):
             
     return fft_xlist, fft_ylist, moving_fft_xlist, moving_fft_ylist
 
-def plot_meanmovingFFT_dP(dP_Ulimit, time_range, interval, window_size):
+def plot_meanmovingFFT_dP(dP_Ulimit, time_range, interval, windowsize):
     '''
     dP_max > dP かつ Ws-ave<Ws_min を満たす全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルとその移動平均のケース平均を算出し、それの描画及び保存を行う関数
+    FFTを用いて導出したパワースペクトルとその移動平均のケース平均を算出し、それの描画した画像を保存する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_max < 0
     time_range:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    window_size:移動平均を計算する際の窓数(int型)
+    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     try:
         #対応する全事象のパワースペクトルとその移動平均をリスト化したものの導出
-        fft_xlist, fft_ylist, moving_fft_xlist, moving_fft_ylist = process_movingFFTlist_dP(dP_Ulimit, time_range, interval, window_size)
+        fft_xlist, fft_ylist, moving_fft_xlist, moving_fft_ylist = process_movingFFTlist_dP(dP_Ulimit, time_range, interval, windowsize)
         if not fft_xlist or not fft_ylist or not moving_fft_xlist or not moving_fft_ylist:
             raise ValueError("No data")
         
@@ -144,10 +144,10 @@ def plot_meanmovingFFT_dP(dP_Ulimit, time_range, interval, window_size):
         # 保存の設定
         output_dir = f'meanmovingFFT_dP_{time_range}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanmovingFFT_dP_~{dP_Ulimit}_windowsize={window_size}.png"))
+        plt.savefig(os.path.join(output_dir, f"meanmovingFFT_dP_~{dP_Ulimit}_windowsize={windowsize}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanmovingFFT_dP_~{dP_Ulimit}_windowsize={window_size}.png")
+        print(f"Save completed: meanmovingFFT_dP_~{dP_Ulimit}_windowsize={windowsize}.png")
         
         return moving_fft_x, moving_fft_y
 
@@ -158,6 +158,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the residual sorted by dP.")
     parser.add_argument('dP_Ulimit', type=int, help="Maximum value of dP(Pa)(Negative)") #dPの上限の指定(負)
     parser.add_argument('time_range', type=int, help='time_rang(s)') #時間間隔(切り出す時間)の指定(秒)
-    parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average") #窓数の指定
+    #パワースペクトルの移動平均を計算する際の窓数の指定
+    parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average")
     args = parser.parse_args()
     plot_meanmovingFFT_dP(args.dP_Ulimit, args.time_range, 20, args.windowsize)

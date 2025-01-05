@@ -14,7 +14,7 @@ import Dispersion_Relation
 import nearmovingFFT
 
 
-def process_movingratio(ID, time_range, interval, window_size):
+def process_movingratio(ID, time_range, interval, windowsize):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を導出し、
@@ -23,7 +23,7 @@ def process_movingratio(ID, time_range, interval, window_size):
     ID:ダストデビルに割り振られた通し番号
     time_range:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    window_size:移動平均を計算する際の窓数(int型)
+    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     try:
         #IDに対応するsol及びMUTCを取得
@@ -48,9 +48,9 @@ def process_movingratio(ID, time_range, interval, window_size):
         '''
         
         #パワースペクトルとその移動平均の導出
-        fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, window_size)
+        fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, windowsize)
 
-        #比の計算
+        #比の算出
         ratio = fft_y/moving_fft_y
 
         return moving_fft_x, ratio, sol
@@ -59,21 +59,21 @@ def process_movingratio(ID, time_range, interval, window_size):
         print(f"An error occurred: {e}")
         return None
     
-def plot_movingratio(ID, time_range, interval, window_size):
+def plot_movingratio(ID, time_range, interval, windowsize):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を計算し、それらの比を描画する関数
+    これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を計算し、それらの比を描画した画像を保存する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度の比
 
     ID:ダストデビルに割り振られた通し番号
     time_range:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    window_size:移動平均を計算する際の窓数(int型)
+    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
 
     '''
     try:
         #パワースペクトルとその移動平均の比を導出
-        moving_fft_x, ratio, sol = process_movingratio(ID, time_range, interval, window_size)
+        moving_fft_x, ratio, sol = process_movingratio(ID, time_range, interval, windowsize)
         
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -90,7 +90,7 @@ def plot_movingratio(ID, time_range, interval, window_size):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'nearmovingratio_{time_range}s_windowsize={window_size}'
+        output_dir = f'nearmovingratio_{time_range}s_windowsize={windowsize}'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingratio.png"))
         plt.clf()
@@ -106,6 +106,7 @@ def plot_movingratio(ID, time_range, interval, window_size):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot pressure changes corresponding to the ID")
     parser.add_argument('ID', type=int, help="ID") #IDの指定
-    parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average") #窓数の指定
+    #パワースペクトルの移動平均を計算する際の窓数の指定
+    parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average")
     args = parser.parse_args()
     plot_movingratio(args.ID, 7200, 20, args.windowsize)

@@ -96,7 +96,7 @@ def process_nearFFT(ID, time_range, interval):
 def plot_nearFFT(ID, time_range, interval):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、FFTを用いてパワースペクトルを導出し、それを描画する関数
+    これに伴い、導出できる残差に対して、FFTを用いてパワースペクトルを導出し、それを描画した画像を保存する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     ID:ダストデビルに割り振られた通し番号

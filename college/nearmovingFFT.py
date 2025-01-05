@@ -12,14 +12,14 @@ import neardevil
 import Dispersion_Relation
 import nearFFT
 
-def moving_FFT(data, window_size):
+def moving_FFT(data, windowsize):
     '''
     フィルタリング及び線形回帰済みの時系列データから
     気圧変化の残差に対してFFTを用いて、
     パワースペクトル及びパワースペクトルの移動平均を返す関数
 
     data:フィルタリング済みの時系列データ(dataframe)
-    window_size:窓数(int型)
+    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
 
     #パワースペクトルの導出
@@ -27,14 +27,15 @@ def moving_FFT(data, window_size):
     
     '''
     以下ではパワースペクトルの移動平均を導出
-    ※fft_x及びfft_yの各要素及び長さは、それ自体に意味があるため、
-    ケース平均した際に問題ないように、正確な移動平均の値が計算できない要素には、
-    nanを代入し、長さを維持するようにしている。
+    ※パワースペクトルの各要素及び長さは、
+    それ自体に意味があるため、ケース平均した際にその情報が壊れないようにするため、
+    正確な移動平均の値が計算できない要素にはnanを代入し、
+    形状を維持するようにしている。
     '''
-    filter_frame = np.ones(window_size) / window_size
+    filter_frame = np.ones(windowsize) / windowsize
 
     #窓数に対応する、片側において移動平均をできない要素の数
-    pad_size = (window_size - 1) // 2
+    pad_size = (windowsize - 1) // 2
     
     #fft_x及びfft_yの要素数に統一したndarray(要素は全てnan)を作成
     moving_fft_x = np.ones(fft_x.shape)*np.nan
@@ -46,7 +47,7 @@ def moving_FFT(data, window_size):
     
     return fft_x, fft_y ,moving_fft_x, moving_fft_y
 
-def process_movingFFT(ID, time_range, interval, window_size):
+def process_movingFFT(ID, time_range, interval, windowsize):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を導出し、
@@ -55,7 +56,7 @@ def process_movingFFT(ID, time_range, interval, window_size):
     ID:ダストデビルに割り振られた通し番号
     time_range:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    window_size:移動平均を計算する際の窓数(int型)
+    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     try:
         #IDに対応するsol及びMUTCを取得
@@ -80,7 +81,7 @@ def process_movingFFT(ID, time_range, interval, window_size):
         '''
         
         #パワースペクトルとその移動平均の導出
-        fft_x, fft_y, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, window_size)
+        fft_x, fft_y, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, windowsize)
 
         return fft_x, fft_y, moving_fft_x, moving_fft_y, sol
     
@@ -88,21 +89,21 @@ def process_movingFFT(ID, time_range, interval, window_size):
         print(f"An error occurred: {e}")
         return None
 
-def plot_movingFFT(ID, time_range, interval, window_size):
+def plot_movingFFT(ID, time_range, interval, windowsize):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を計算し、それらを描画する関数
+    これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を計算し、それらを描画した画像を保存する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     ID:ダストデビルに割り振られた通し番号
     time_range:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    window_size:移動平均を計算する際の窓数(int型)
+    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
 
     '''
     try:
         #パワースペクトルとその移動平均の導出
-        fft_x, fft_y, moving_fft_x, moving_fft_y, sol = process_movingFFT(ID, time_range, interval, window_size)
+        fft_x, fft_y, moving_fft_x, moving_fft_y, sol = process_movingFFT(ID, time_range, interval, windowsize)
         
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -121,7 +122,7 @@ def plot_movingFFT(ID, time_range, interval, window_size):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'nearmovingFFT_{time_range}s_windowsize={window_size}'
+        output_dir = f'nearmovingFFT_{time_range}s_windowsize={windowsize}'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingFFT.png"))
         plt.clf()
@@ -137,6 +138,7 @@ def plot_movingFFT(ID, time_range, interval, window_size):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot pressure changes corresponding to the ID")
     parser.add_argument('ID', type=int, help="ID") #IDの指定
-    parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average") #窓数の指定
+    #パワースペクトルの移動平均を計算する際の窓数の指定
+    parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average")
     args = parser.parse_args()
     plot_movingFFT(args.ID, 7200, 20, args.windowsize)
