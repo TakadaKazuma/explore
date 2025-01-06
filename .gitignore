@@ -23,6 +23,8 @@ nearmovingFFT_*s_windowsize*
 
 nearmovingratio_*s_windowsize*
 
+neartwicemovingratio_*s_windowsize
+
 meanFFT_sortedseason_*s
 
 meanFFT_sortedATandWs_*s
