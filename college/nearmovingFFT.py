@@ -136,7 +136,7 @@ def plot_movingFFT(ID, time_range, interval, windowsize):
         return None
     
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot pressure changes corresponding to the ID")
+    parser = argparse.ArgumentParser(description="Plot the moving average of the power spectrum corresponding to the ID")
     parser.add_argument('ID', type=int, help="ID") #IDの指定
     #パワースペクトルの移動平均を計算する際の窓数の指定
     parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average")

@@ -33,7 +33,7 @@ def process_and_save_csv(file_path):
     return output_file
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="processes a CSV file and saves the result.")
+    parser = argparse.ArgumentParser(description="Processes a CSV file and saves the result.")
     parser.add_argument('file_path', type=str, help="Path to the CSV file to be processed")
     args = parser.parse_args()
     output_file = process_and_save_csv(args.file_path)

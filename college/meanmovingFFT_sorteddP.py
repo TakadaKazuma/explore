@@ -155,7 +155,7 @@ def plot_meanmovingFFT_dP(dP_Ulimit, time_range, interval, windowsize):
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the residual sorted by dP.")
+    parser = argparse.ArgumentParser(description="Plot the average moving power spectrum for each dP_Ulimit")
     parser.add_argument('dP_Ulimit', type=int, help="Maximum value of dP(Pa)(Negative)") #dPの上限の指定(負)
     parser.add_argument('time_range', type=int, help='time_rang(s)') #時間間隔(切り出す時間)の指定(秒)
     #パワースペクトルの移動平均を計算する際の窓数の指定

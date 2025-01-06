@@ -10,43 +10,17 @@ import DATACATALOG
 import dailychange_p
 import neardevil
 import nearFFT
+import meanFFT_sortedseason
 import Dispersion_Relation
 import nearmovingFFT
+import neartwicemovingratio
 
-def caluclate_movingave(x, y, windowsize):
+def process_twicemovingresampleratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
     '''
-    x及びyの移動平均を算出する関数
-    ※用途は主にmovingratio移動平均を算出
-
-    x:移動平均を算出したいndarray
-    y:xと対をなす移動平均を算出したいndarray
-    windowsize:移動平均を計算する際の窓数(int型)
-    '''
-
-    '''
-    以下では形状を維持しつつ、x及びyの移動平均を導出
-    ※主にx,yはパワースペクトルをその移動平均で割ったものが対象となる。
-    パワースペクトルの各要素及び長さは、それ自体に意味があるため、
-    パワースペクトルから算出される計算の対象も同様である。
-    移動平均を算出した際にその情報が壊れないようにするため、
-    正確な移動平均の値が計算できない要素にnanを代入し、
-    形状を維持するようにしている。
-    '''
-    filter_frame = np.ones(windowsize) / windowsize
-    pad_size = (windowsize - 1) // 2
-    moving_x = np.ones(x.shape)*np.nan
-    moving_y = np.ones(y.shape)*np.nan
-    
-    moving_x[pad_size:-pad_size] = np.convolve(x, filter_frame, mode="valid")
-    moving_y[pad_size:-pad_size] = np.convolve(y, filter_frame, mode='valid')
-    
-    return moving_x, moving_y
-
-def process_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
-    '''
-    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
+    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを0.5秒間隔でresampleした後に、線形回帰を実行。
     これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を導出し、
     それらの比に対して再度移動平均を算出したもの(ndarray型)及び対応するsol(int型)を返す関数
+    
 
     ID:ダストデビルに割り振られた通し番号
     time_range:時間間隔(切り出す時間)(秒)(int型)
@@ -68,6 +42,9 @@ def process_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize
         if near_devildata is None:
             raise ValueError("")
         
+        #加工済みデータを0.5秒でresample      
+        near_devildata = meanFFT_sortedseason.data_resample(near_devildata, 0.5)
+        
         near_devildata = nearFFT.calculate_residual(near_devildata)
         '''
         「countdown」、「p-pred」、「residual」カラムの追加
@@ -83,7 +60,7 @@ def process_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize
         ratio = fft_y/moving_fft_y
 
         #比の移動平均を算出
-        twice_moving_fft_x, moving_ratio = caluclate_movingave(moving_fft_x, ratio, windowsize_ratio)
+        twice_moving_fft_x, moving_ratio = neartwicemovingratio.caluclate_movingave(moving_fft_x, ratio, windowsize_ratio)
 
         return twice_moving_fft_x, moving_ratio, sol
     
@@ -91,9 +68,9 @@ def process_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize
         print(f"An error occurred: {e}")
         return None
 
-def plot_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
+def plot_twicemovingratio_resample(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
     '''
-    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
+    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを0.5秒間隔でresampleした後、線形回帰を実行
     これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を導出し、
     それらの比に対して再度移動平均を算出したものを描画した画像を保存する関数
 
@@ -105,7 +82,7 @@ def plot_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize_ra
     '''
     try:
         #パワースペクトルとその移動平均の比を導出し、更にその移動平均を算出する
-        twice_moving_fft_x, moving_ratio, sol = process_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio)
+        twice_moving_fft_x, moving_ratio, sol = process_twicemovingresampleratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio)
 
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -122,12 +99,12 @@ def plot_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize_ra
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'neartwicemovingratio_{timerange}s_windowsize={windowsize_ratio}'
+        output_dir = f'neartwicemovingresampleratio_{timerange}s_windowsize={windowsize_ratio}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingratio.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingresampleratio.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingratio.png")
+        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingresampleratio.png")
         
         return twice_moving_fft_x, moving_ratio, sol
     
@@ -137,11 +114,12 @@ def plot_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize_ra
     
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the moving average of the ratio of the power spectrum to its moving average for the resampled data corresponding to the given ID.")
+    parser = argparse.ArgumentParser(description="Plot the moving average of the ratio of the power spectrum to its moving average for the given ID")
     parser.add_argument('ID', type=int, help="ID") #IDの指定
     #パワースペクトルの移動平均を計算する際の窓数の指定
     parser.add_argument('windowsize_FFT', type=int, help="The [windowsize] used to calculate the moving average of FFT")
     #パワースペクトルとその移動平均の比の移動平均を計算する際の窓数の指定
     parser.add_argument('windowsize_FFT', type=int, help="The [windowsize] used to calculate the moving average of ratio")
     args = parser.parse_args()
-    plot_twicemovingratio(args.ID, 7200, 20, args.windowsize_FFT, args.windowsize_ratio)
+    plot_twicemovingratio_resample(args.ID, 7200, 20, args.windowsize_FFT, args.windowsize_ratio)
+
