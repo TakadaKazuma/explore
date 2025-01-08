@@ -12,14 +12,14 @@ import neardevil
 import Dispersion_Relation
 import nearFFT
 
-def moving_FFT(data, window_size):
+def moving_FFT(data, windowsize):
     '''
     フィルタリング及び線形回帰済みの時系列データから
     気圧変化の残差に対してFFTを用いて、
     パワースペクトル及びパワースペクトルの移動平均を返す関数
 
     data:フィルタリング済みの時系列データ(dataframe)
-    window_size:窓数(int型)
+    windowsize:窓数(int型)
     '''
 
     #パワースペクトルの導出
@@ -31,14 +31,14 @@ def moving_FFT(data, window_size):
     ケース平均した際に問題ないように、正確な移動平均の値が計算できない要素には、
     nanを代入し、長さを維持するようにしている。
     '''
-    filter_frame = np.ones(window_size) / window_size
+    filter_frame = np.ones(windowsize) / windowsize
 
     #窓数に対応する、片側において移動平均をできない要素の数
-    pad_size = (window_size - 1) // 2
+    pad_size = (windowsize - 1) // 2
     
     #fft_x及びfft_yの要素数に統一したndarray(要素は全てnan)を作成
-    moving_fft_x = np.ones(fft_x.shape)*np.nan
-    moving_fft_y = np.ones(fft_y.shape)*np.nan
+    moving_fft_x = np.full(fft_x.shape, np.nan)
+    moving_fft_y = np.full(fft_y.shape, np.nan)
     
     #移動平均を計算できる範囲のみ、その値に変更
     moving_fft_x[pad_size:-pad_size] = np.convolve(fft_x, filter_frame, mode="valid")
@@ -46,7 +46,7 @@ def moving_FFT(data, window_size):
     
     return fft_x, fft_y ,moving_fft_x, moving_fft_y
 
-def process_movingFFT(ID, time_range, interval, window_size):
+def process_movingFFT(ID, time_range, interval, windowsize):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を導出し、
@@ -80,7 +80,7 @@ def process_movingFFT(ID, time_range, interval, window_size):
         '''
         
         #パワースペクトルとその移動平均の導出
-        fft_x, fft_y, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, window_size)
+        fft_x, fft_y, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, windowsize)
 
         return fft_x, fft_y, moving_fft_x, moving_fft_y, sol
     
@@ -89,7 +89,7 @@ def process_movingFFT(ID, time_range, interval, window_size):
         return None
 
 
-def plot_movingFFT(ID, time_range, interval, window_size):
+def plot_movingFFT(ID, time_range, interval, windowsize):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を計算し、それらを描画する関数
@@ -103,7 +103,7 @@ def plot_movingFFT(ID, time_range, interval, window_size):
     '''
     try:
         #パワースペクトルとその移動平均の導出
-        fft_x, fft_y, moving_fft_x, moving_fft_y, sol = process_movingFFT(ID, time_range, interval, window_size)
+        fft_x, fft_y, moving_fft_x, moving_fft_y, sol = process_movingFFT(ID, time_range, interval, windowsize)
         
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -122,7 +122,7 @@ def plot_movingFFT(ID, time_range, interval, window_size):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'nearmovingFFT_{time_range}s'
+        output_dir = f'nearmovingFFT_{time_range}s_windowsize={windowsize}'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingFFT.png"))
         plt.clf()
