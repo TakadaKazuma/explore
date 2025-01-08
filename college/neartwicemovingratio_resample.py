@@ -60,7 +60,7 @@ def process_twicemovingresampleratio(ID, timerange, interval, windowsize_FFT, wi
         ratio = fft_y/moving_fft_y
 
         #比の移動平均を算出
-        twice_moving_fft_x, moving_ratio = neartwicemovingratio.caluclate_movingave(moving_fft_x, ratio, windowsize_ratio)
+        twice_moving_fft_x, moving_ratio = neartwicemovingratio.calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
 
         return twice_moving_fft_x, moving_ratio, sol
     
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     #パワースペクトルの移動平均を計算する際の窓数の指定
     parser.add_argument('windowsize_FFT', type=int, help="The [windowsize] used to calculate the moving average of FFT")
     #パワースペクトルとその移動平均の比の移動平均を計算する際の窓数の指定
-    parser.add_argument('windowsize_FFT', type=int, help="The [windowsize] used to calculate the moving average of ratio")
+    parser.add_argument('windowsize_ratio', type=int, help="The [windowsize] used to calculate the moving average of ratio")
     args = parser.parse_args()
     plot_twicemovingratio_resample(args.ID, 7200, 20, args.windowsize_FFT, args.windowsize_ratio)
 

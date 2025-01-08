@@ -13,7 +13,7 @@ import nearFFT
 import Dispersion_Relation
 import nearmovingFFT
 
-def caluclate_movingave(x, y, windowsize):
+def calculate_movingave(x, y, windowsize):
     '''
     x及びyの移動平均を算出する関数
     ※用途は主にmovingratio移動平均を算出
@@ -83,7 +83,7 @@ def process_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize
         ratio = fft_y/moving_fft_y
 
         #比の移動平均を算出
-        twice_moving_fft_x, moving_ratio = caluclate_movingave(moving_fft_x, ratio, windowsize_ratio)
+        twice_moving_fft_x, moving_ratio = calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
 
         return twice_moving_fft_x, moving_ratio, sol
     
@@ -122,12 +122,12 @@ def plot_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize_ra
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'neartwicemovingratio_{timerange}s_windowsize={windowsize_ratio}'
+        output_dir = f'neartwicemovingratio_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingratio.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize={windowsize_ratio},twicemovingratio.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingratio.png")
+        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize={windowsize_ratio},twicemovingratio.png")
         
         return twice_moving_fft_x, moving_ratio, sol
     
@@ -142,6 +142,6 @@ if __name__ == "__main__":
     #パワースペクトルの移動平均を計算する際の窓数の指定
     parser.add_argument('windowsize_FFT', type=int, help="The [windowsize] used to calculate the moving average of FFT")
     #パワースペクトルとその移動平均の比の移動平均を計算する際の窓数の指定
-    parser.add_argument('windowsize_FFT', type=int, help="The [windowsize] used to calculate the moving average of ratio")
+    parser.add_argument('windowsize_ratio', type=int, help="The [windowsize] used to calculate the moving average of ratio")
     args = parser.parse_args()
     plot_twicemovingratio(args.ID, 7200, 20, args.windowsize_FFT, args.windowsize_ratio)
