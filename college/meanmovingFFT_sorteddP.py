@@ -116,10 +116,10 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
             raise ValueError("No data")
         
         # パワースペクトルとその移動平均のケース平均の導出
-        fft_x = process_arrays_with_nan(fft_xlist, np.mean)
-        fft_y = process_arrays_with_nan(fft_ylist, np.mean) 
-        moving_fft_x = process_arrays_with_nan(moving_fft_xlist, np.mean)
-        moving_fft_y = process_arrays_with_nan(moving_fft_ylist, np.mean)
+        fft_x = process_arrays(fft_xlist, np.nanmean)
+        fft_y = process_arrays(fft_ylist, np.nanmean) 
+        moving_fft_x = process_arrays(moving_fft_xlist, np.nanmean)
+        moving_fft_y = process_arrays(moving_fft_ylist, np.nanmean)
         
         # 音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()

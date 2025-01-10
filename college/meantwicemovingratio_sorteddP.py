@@ -103,10 +103,10 @@ def plot_meantwicemovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT,
             raise ValueError("No data")
         
         # 平均の導出
-        moving_fft_x = meanmovingFFT_sorteddP.process_arrays_with_nan(moving_fft_xlist, np.mean)
-        ratio = meanmovingFFT_sorteddP.process_arrays_with_nan(ratiolist, np.mean)
-        twice_moving_fft_x = meanmovingFFT_sorteddP.process_arrays_with_nan(twice_moving_fft_xlist, np.mean)
-        moving_ratio =  meanmovingFFT_sorteddP.process_arrays_with_nan(moving_ratiolist, np.mean)
+        moving_fft_x = meanmovingFFT_sorteddP.process_arrays(moving_fft_xlist, np.nanmean)
+        ratio = meanmovingFFT_sorteddP.process_arrays(ratiolist, np.nanmean)
+        twice_moving_fft_x = meanmovingFFT_sorteddP.process_arrays(twice_moving_fft_xlist, np.nanmean)
+        moving_ratio =  meanmovingFFT_sorteddP.process_arrays(moving_ratiolist, np.nanmean)
         
         # 音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()

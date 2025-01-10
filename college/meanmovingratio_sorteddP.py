@@ -97,8 +97,8 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize):
             raise ValueError("No data")
         
         # パワースペクトルと移動平均の比のケース平均を導出
-        moving_fft_x = meanmovingFFT_sorteddP.process_arrays_with_nan(moving_fft_xlist, np.mean)
-        ratio = meanmovingFFT_sorteddP.process_arrays_with_nan(ratiolist, np.mean)
+        moving_fft_x = meanmovingFFT_sorteddP.process_arrays(moving_fft_xlist, np.nanmean)
+        ratio = meanmovingFFT_sorteddP.process_arrays(ratiolist, np.mean)
         
         # 音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
