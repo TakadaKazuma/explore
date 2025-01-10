@@ -34,10 +34,10 @@ def caluclate_movingave(x, y, windowsize):
     '''
     filter_frame = np.ones(windowsize) / windowsize
     pad_size = (windowsize - 1) // 2
-    moving_x = np.ones(x.shape)*np.nan
-    moving_y = np.ones(y.shape)*np.nan
+    moving_x = np.full(x.shape, np.nan)
+    moving_y = np.ones(y.shape, np.nan)
     
-    moving_x[pad_size:-pad_size] = np.convolve(x, filter_frame, mode="valid")
+    moving_x[pad_size:-pad_size] = x[pad_size:-pad_size]
     moving_y[pad_size:-pad_size] = np.convolve(y, filter_frame, mode='valid')
     
     return moving_x, moving_y
