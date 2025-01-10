@@ -30,7 +30,14 @@ def moving_FFT(data, windowsize):
     ※fft_x及びfft_yの各要素及び長さは、それ自体に意味があるため、
     ケース平均した際に問題ないように、正確な移動平均の値が計算できない要素には、
     nanを代入し、長さを維持するようにしている。
+    また、今回取り扱うパワースペクトルは低周波側の成分が強力であるが、
+    本研究においては高周波側に着目している。
+    そのため、移動平均を計算する際に低周波側の影響力を軽減するため、
+    パワーの常用対数をとり、その移動平均を算出した後に元に戻す作業を行っている。
     '''
+    #パワーの常用対数を導出
+    log10_fft_y = np.log10(fft_y) 
+
     filter_frame = np.ones(windowsize) / windowsize
 
     #窓数に対応する、片側において移動平均をできない要素の数
@@ -38,11 +45,14 @@ def moving_FFT(data, windowsize):
     
     #fft_x及びfft_yの要素数に統一したndarray(要素は全てnan)を作成
     moving_fft_x = np.full(fft_x.shape, np.nan)
-    moving_fft_y = np.full(fft_y.shape, np.nan)
+    log10_moving_fft_y = np.full(fft_y.shape, np.nan)
     
     #移動平均を計算できる範囲のみ、その値に変更
-    moving_fft_x[pad_size:-pad_size] = np.convolve(fft_x, filter_frame, mode="valid")
-    moving_fft_y[pad_size:-pad_size] = np.convolve(fft_y, filter_frame, mode="valid")   
+    moving_fft_x[pad_size:-pad_size] = fft_x[pad_size:-pad_size]
+    log10_moving_fft_y[pad_size:-pad_size] = np.convolve(log10_fft_y, filter_frame, mode="valid") 
+
+    #パワーの常用対数を元に戻す
+    moving_fft_y = 10**(log10_moving_fft_y)  
     
     return fft_x, fft_y ,moving_fft_x, moving_fft_y
 
