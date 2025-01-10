@@ -13,7 +13,6 @@ import Dispersion_Relation
 import nearFFT
 
 def moving_FFT(data, windowsize):
-def moving_FFT(data, windowsize):
     '''
     フィルタリング及び線形回帰済みの時系列データから
     気圧変化の残差に対してFFTを用いて、
@@ -33,6 +32,9 @@ def moving_FFT(data, windowsize):
     正確な移動平均の値が計算できない要素にはnanを代入し、
     形状を維持するようにしている。
     '''
+    #パワーの常用対数を算出
+    log10_fft_y = np.log10(fft_y)
+
     filter_frame = np.ones(windowsize) / windowsize
 
     #窓数に対応する、片側において移動平均をできない要素の数
