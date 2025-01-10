@@ -34,13 +34,34 @@ def calculate_movingave(x, y, windowsize):
     '''
     filter_frame = np.ones(windowsize) / windowsize
     pad_size = (windowsize - 1) // 2
-    moving_x = np.ones(x.shape)*np.nan
-    moving_y = np.ones(y.shape)*np.nan
+    moving_x = np.full(x.shape, np.nan)
+    moving_y = np.ones(y.shape, np.nan)
     
-    moving_x[pad_size:-pad_size] = np.convolve(x, filter_frame, mode="valid")
+    moving_x[pad_size:-pad_size] = x[pad_size:-pad_size]
     moving_y[pad_size:-pad_size] = np.convolve(y, filter_frame, mode='valid')
     
     return moving_x, moving_y
+
+
+def filter_xUlimit(x, y, xUlimit):
+    '''
+    指定された上限以上の値をとるxの要素に全てnanに変更し、
+    そのxの要素に対応したyの要素もnanに変更する関数。
+
+    x:フィルタリングを行いたいndarray
+    y:ndarray
+    x_Ulimit:xの基準となる上限(int型)
+    '''
+    # 配列の型をNan取り扱うことが可能なものに変換
+    x = x.astype(float)
+    y = y.astype(float)
+
+    # 条件を満たす要素を
+    x[x >= xUlimit] = np.nan
+    y[x >= xUlimit] = np.nan
+
+    return x, y
+
 
 def process_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
     '''
@@ -78,6 +99,12 @@ def process_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize
         
         #パワースペクトルとその移動平均の導出
         fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, windowsize_FFT)
+
+    
+        #特定の周波数より高周波の情報をnanに変更
+        fft_x, fft_y = filter_xUlimit(fft_x, fft_y, 4.5)
+        moving_fft_x, moving_fft_y = filter_xUlimit(moving_fft_x, moving_fft_y, 4.5)
+    
 
         #比の算出
         ratio = fft_y/moving_fft_y
