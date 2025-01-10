@@ -13,7 +13,7 @@ import nearFFT
 import Dispersion_Relation
 import nearmovingFFT
 
-def caluclate_movingave(x, y, windowsize):
+def calculate_movingave(x, y, windowsize):
     '''
     x及びyの移動平均を算出する関数
     ※用途は主にmovingratio移動平均を算出
@@ -110,7 +110,7 @@ def process_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize
         ratio = fft_y/moving_fft_y
 
         #比の移動平均を算出
-        twice_moving_fft_x, moving_ratio = caluclate_movingave(moving_fft_x, ratio, windowsize_ratio)
+        twice_moving_fft_x, moving_ratio = calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
 
         return twice_moving_fft_x, moving_ratio, sol
     
