@@ -13,6 +13,7 @@ import Dispersion_Relation
 import nearFFT
 
 def moving_FFT(data, windowsize):
+def moving_FFT(data, windowsize):
     '''
     フィルタリング及び線形回帰済みの時系列データから
     気圧変化の残差に対してFFTを用いて、
@@ -36,14 +37,18 @@ def moving_FFT(data, windowsize):
 
     #窓数に対応する、片側において移動平均をできない要素の数
     pad_size = (windowsize - 1) // 2
+    pad_size = (windowsize - 1) // 2
     
     #fft_x及びfft_yの要素数に統一したndarray(要素は全てnan)を作成
-    moving_fft_x = np.ones(fft_x.shape)*np.nan
-    moving_fft_y = np.ones(fft_y.shape)*np.nan
+    moving_fft_x = np.full(fft_x.shape, np.nan)
+    log10_moving_fft_y = np.full(fft_y.shape, np.nan)
     
     #移動平均を計算できる範囲のみ、その値に変更
-    moving_fft_x[pad_size:-pad_size] = np.convolve(fft_x, filter_frame, mode="valid")
-    moving_fft_y[pad_size:-pad_size] = np.convolve(fft_y, filter_frame, mode="valid")   
+    moving_fft_x[pad_size:-pad_size] = fft_x[pad_size:-pad_size]
+    log10_moving_fft_y[pad_size:-pad_size] = np.convolve(log10_fft_y, filter_frame, mode="valid") 
+
+    #パワーの常用対数を元に戻す
+    moving_fft_y = 10**(log10_moving_fft_y)  
     
     return fft_x, fft_y ,moving_fft_x, moving_fft_y
 
@@ -81,6 +86,7 @@ def process_movingFFT(ID, timerange, interval, windowsize):
         '''
         
         #パワースペクトルとその移動平均の導出
+        fft_x, fft_y, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, windowsize)
         fft_x, fft_y, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, windowsize)
 
         return fft_x, fft_y, moving_fft_x, moving_fft_y, sol
