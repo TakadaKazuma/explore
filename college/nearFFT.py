@@ -51,14 +51,14 @@ def FFT(data):
     
     return fft_x, fft_y
 
-def process_nearFFT(ID, time_range, interval):
+def process_nearFFT(ID, timerange, interval):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、
     FFTを用いてパワースペクトルを導出(各々ndarray)及び対応するsol(int型)を返す関数
 
     ID:ダストデビルに割り振られた通し番号
-    time_range:時間間隔(切り取る時間)(秒)(int型)
+    timerange:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
     try:
@@ -71,7 +71,7 @@ def process_nearFFT(ID, time_range, interval):
             raise ValueError("")
         
         #該当範囲の抽出
-        near_devildata = neardevil.filter_neardevildata(data, MUTC, time_range, interval)
+        near_devildata = neardevil.filter_neardevildata(data, MUTC, timerange, interval)
         if near_devildata is None:
             raise ValueError("")
         
@@ -93,19 +93,19 @@ def process_nearFFT(ID, time_range, interval):
         return None
 
 
-def plot_nearFFT(ID, time_range, interval):
+def plot_nearFFT(ID, timerange, interval):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、FFTを用いてパワースペクトルを導出し、それを描画した画像を保存する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     ID:ダストデビルに割り振られた通し番号
-    time_range:時間間隔(切り取る時間)(秒)(int型)
+    timerange:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
     try:
         #パワースペクトルの導出
-        fft_x, fft_y, sol = process_nearFFT(ID, time_range, interval)
+        fft_x, fft_y, sol = process_nearFFT(ID, timerange, interval)
         
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -116,7 +116,7 @@ def plot_nearFFT(ID, time_range, interval):
         plt.ylim(1e-8,1e8)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={time_range}s')
+        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={timerange}s')
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel(f'Pressure Power [$Pa^2&]')
         plt.grid(True)
@@ -124,7 +124,7 @@ def plot_nearFFT(ID, time_range, interval):
         plt.legend()
         
         #保存の設定
-        output_dir = f'nearFFT_{time_range}s'
+        output_dir = f'nearFFT_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_nearFFT.png"))
         plt.clf()
@@ -140,6 +140,6 @@ def plot_nearFFT(ID, time_range, interval):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot Power Spectrum corresponding to the ID")
     parser.add_argument('ID', type=int, help="ID") #IDの指定
-    parser.add_argument('time_range', type=int, help='time_rang(s)') #時間間隔(切り出す時間)の指定(秒)
+    parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
-    plot_nearFFT(args.ID, args.time_range, 20)
+    plot_nearFFT(args.ID, args.timerange, 20)

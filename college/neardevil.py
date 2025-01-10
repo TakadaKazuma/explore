@@ -18,18 +18,18 @@ def get_sol_MUTC(ID):
     MUTC = datacatalog.MUTC[ID]
     return sol, MUTC
 
-def filter_neardevildata(data, MUTC, time_range, interval):
+def filter_neardevildata(data, MUTC, timerange, interval):
     '''
     与えられた時系列データを「MUTCの(time_range+interval)秒前」~ 「MUTCのinterval秒前」の区間で切り取り、そのデータを返す関数(dataframe型)
     →与えられた時系列データを「dustdevilの発生直前 ~ 発生寸前」までの区間で切り取り、そのデータを返す関数(dataframe型)
 
     data:気圧の時系列データ(dataframe)
     MUTC:dustdevil発生時刻※ 火星地方日時 (datetime型)
-    time_range:時間間隔(切り取る時間)(秒)(int型)
+    timerange:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切るか)(秒)(int型)
     '''
     stop = MUTC - datetime.timedelta(seconds=interval)
-    start = stop - datetime.timedelta(seconds=time_range)
+    start = stop - datetime.timedelta(seconds=timerange)
     filtered_data = data.query('@start < MUTC < @stop').copy()
     
     return filtered_data
@@ -49,12 +49,12 @@ def calculate_countdown(data):
     
     return new_data
 
-def process_neardevildata(ID, time_range, interval):
+def process_neardevildata(ID, timerange, interval):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを返す関数
 
     ID:ダストデビルに割り振られた通し番号
-    time_range:時間間隔(切り取る時間)(秒)(int型)
+    timerange:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
     try:
@@ -67,7 +67,7 @@ def process_neardevildata(ID, time_range, interval):
             raise ValueError("")
         
         #該当時系列データをdustdevil近辺でフィルタリング
-        near_devildata = filter_neardevildata(data, MUTC, time_range, interval)
+        near_devildata = filter_neardevildata(data, MUTC, timerange, interval)
         if near_devildata is None:
             raise ValueError("")
         
@@ -80,24 +80,23 @@ def process_neardevildata(ID, time_range, interval):
         print(f"An error occurred: {e}")
         return None
 
-def plot_neardevil(ID, time_range, interval):
+def plot_neardevil(ID, timerange, interval):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを描画した画像を保存する関数
     ※横軸:countdown(s) 縦軸:気圧(Pa)
 
     ID:ダストデビルに割り振られた通し番号
-    time_range:時間間隔(切り取る時間)(秒)(int型)
+    timerange:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
     try:
         #描画する時系列データの取得
-        near_devildata, sol = process_neardevildata(ID, time_range, interval)
+        near_devildata, sol = process_neardevildata(ID, timerange, interval)
         if near_devildata is None:
             raise ValueError(f"No data:sol={sol}")
 
         #描画の設定
-        plt.plot(near_devildata['countdown'],near_devildata['p'],
-                 label='true_value')
+        plt.plot(near_devildata['countdown'],near_devildata['p'])
         plt.xlabel('Time until devil starts [s]')
         plt.ylabel('Pressure [Pa]')
         plt.title(f'ID={ID},sol={sol}')
@@ -106,7 +105,7 @@ def plot_neardevil(ID, time_range, interval):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'neardevil_{time_range}s'
+        output_dir = f'neardevil_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_neardevil.png"))
         plt.close()
@@ -121,6 +120,6 @@ def plot_neardevil(ID, time_range, interval):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot pressure changes corresponding to the ID")
     parser.add_argument('ID', type=int, help="ID") #IDの指定
-    parser.add_argument('time_range', type=int, help='time_range(s)') #時間間隔(切り出す時間)の指定(秒)
+    parser.add_argument('timerange', type=int, help='timerange(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
-    plot_neardevil(args.ID, args.time_range, 20)
+    plot_neardevil(args.ID, args.timerange, 20)

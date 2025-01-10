@@ -37,5 +37,7 @@ meanmovingFFT_dP_*s
 
 meanmovingratio_dp_*s
 
+meantwicemovingratio_dP_*s_windowsize*
+
 #ログテキストファイル
 Errorlog*.txt

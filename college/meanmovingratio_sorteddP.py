@@ -130,8 +130,8 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the average ratio of the power spectrum to its moving average for different values of dP_Ulimit")
     parser.add_argument('dP_Ulimit', type=int, help="Maximum value of dP(Pa)(Negative)") #dPの上限の指定(負)
-    parser.add_argument('time_range', type=int, help='time_rang(s)') #時間間隔(切り出す時間)の指定(秒)
+    parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
     #パワースペクトルの移動平均を計算する際の窓数の指定
     parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average") 
     args = parser.parse_args()
-    plot_meanmovingratio_dP(args.dP_Ulimit, args.time_range, 20, args.windowsize)
+    plot_meanmovingratio_dP(args.dP_Ulimit, args.timerange, 20, args.windowsize)

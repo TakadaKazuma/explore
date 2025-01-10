@@ -23,7 +23,7 @@ def process_twicemovingresampleratio(ID, timerange, interval, windowsize_FFT, wi
     
 
     ID:ダストデビルに割り振られた通し番号
-    time_range:時間間隔(切り出す時間)(秒)(int型)
+    timerange:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
     windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     windowsize_ratio:パワースペクトルとその移動平均の比の移動平均を計算するときの窓数(int型)
@@ -116,10 +116,11 @@ def plot_twicemovingratio_resample(ID, timerange, interval, windowsize_FFT, wind
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the moving average of the ratio of the power spectrum to its moving average for the given ID")
     parser.add_argument('ID', type=int, help="ID") #IDの指定
+    parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
     #パワースペクトルの移動平均を計算する際の窓数の指定
     parser.add_argument('windowsize_FFT', type=int, help="The [windowsize] used to calculate the moving average of FFT")
     #パワースペクトルとその移動平均の比の移動平均を計算する際の窓数の指定
     parser.add_argument('windowsize_ratio', type=int, help="The [windowsize] used to calculate the moving average of ratio")
     args = parser.parse_args()
-    plot_twicemovingratio_resample(args.ID, 7200, 20, args.windowsize_FFT, args.windowsize_ratio)
+    plot_twicemovingratio_resample(args.ID, args.timerange, 20, args.windowsize_FFT, args.windowsize_ratio)
 

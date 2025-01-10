@@ -26,14 +26,14 @@ def process_IDlist_dP(dP_Ulimit):
     filtered_list = datacatalog[datacatalog['dP'] < dP_Ulimit ]
     return filtered_list['ID'].tolist()
 
-def process_FFTlist_dP(dP_Ulimit, time_range, interval):
+def process_FFTlist_dP(dP_Ulimit, timerange, interval):
     '''
     dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
     FFTを用いて導出したパワースペクトルをリスト化したものを返す関数
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_Ulimit < 0
-    time_range:時間間隔(切り出す時間)(秒)(int型)
+    timerange:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
     '''
      #記録用配列の作成
@@ -52,7 +52,7 @@ def process_FFTlist_dP(dP_Ulimit, time_range, interval):
                 raise ValueError("")
             
             #該当範囲の抽出
-            near_devildata = neardevil.filter_neardevildata(data, MUTC, time_range, interval)
+            near_devildata = neardevil.filter_neardevildata(data, MUTC, timerange, interval)
 
             #加工済みデータを0.5秒でresample
             near_devildata = meanFFT_sortedseason.data_resample(near_devildata, 0.5)
@@ -80,7 +80,7 @@ def process_FFTlist_dP(dP_Ulimit, time_range, interval):
             
     return fft_xlist, fft_ylist
 
-def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
+def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
     '''
     dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
     FFTを用いて導出したパワースペクトルをケース平均し、それの描画した画像を保存する関数
@@ -93,7 +93,7 @@ def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
     '''
     try:
         #対応する全事象のパワースペクトルをリスト化したものの導出
-        fft_xlist, fft_ylist = process_FFTlist_dP(dP_Ulimit, time_range, interval)
+        fft_xlist, fft_ylist = process_FFTlist_dP(dP_Ulimit, timerange, interval)
         if not fft_xlist or not fft_ylist:
             raise ValueError("No data")
         
@@ -110,7 +110,7 @@ def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
         plt.ylim(1e-8, 1e8)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'dP <{dP_Ulimit}.timerange={time_range}s')
+        plt.title(f'dP <{dP_Ulimit}.timerange={timerange}s')
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
@@ -118,7 +118,7 @@ def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
         plt.tight_layout()
         
         # 保存の設定
-        output_dir = f'meanFFT_dP_{time_range}s'
+        output_dir = f'meanFFT_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"meanFFT_dP_~{dP_Ulimit}.png"))
         plt.clf()
@@ -133,6 +133,6 @@ def plot_meanFFT_dP(dP_Ulimit, time_range, interval):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the dP_Ulimit") 
     parser.add_argument('dP_Ulimit', type=int, help="Serves as the standard for the upper limit of dP_ave(Negative int)") #dPの上限の指定(負)
-    parser.add_argument('time_range', type=int, help='time_rang(s)') #時間間隔(切り出す時間)の指定(秒)
+    parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
-    plot_meanFFT_dP(args.dP_Ulimit, args.time_range, 20)
+    plot_meanFFT_dP(args.dP_Ulimit, args.timerange, 20)
