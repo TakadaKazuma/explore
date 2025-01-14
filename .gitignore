@@ -21,11 +21,11 @@ nearFFT_*s
 
 nearmovingFFT_*s_windowsize*
 
-nearmovingratio_*s_windowsize*
+nearratio_*s_windowsize*
 
-neartwicemovingratio_*s_windowsize
+nearmovingratio_*s_windowsize
 
-neartwicemovingresampleratio_*s_windowsize*
+nearmovingresampleratio_*s_windowsize*
 
 meanFFT_sortedseason_*s
 
@@ -35,9 +35,9 @@ meanFFT_sorteddP_*s
 
 meanmovingFFT_dP_*s
 
-meanmovingratio_dp_*s
+meanratio_dp_*s
 
-meantwicemovingratio_dP_*s_windowsize*
+meanmovingratio_dP_*s_windowsize*
 
 #ログテキストファイル
 Errorlog*.txt
