@@ -91,7 +91,6 @@ def process_movingFFT(ID, timerange, interval, windowsize):
         
         #パワースペクトルとその移動平均の導出
         fft_x, fft_y, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, windowsize)
-        fft_x, fft_y, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, windowsize)
 
         return fft_x, fft_y, moving_fft_x, moving_fft_y, sol
     
@@ -121,6 +120,7 @@ def plot_movingFFT(ID, timerange, interval, windowsize):
         #描画の設定
         plt.xscale('log')
         plt.yscale('log')
+        plt.ylim(1e-8,1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.plot(moving_fft_x, moving_fft_y,label='FFT_Moving_mean')
         plt.axvline(x=w, color='r', label='border')

@@ -98,8 +98,8 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
             raise ValueError("No data")
         
         #パワースペクトルのケース平均を導出
-        fft_x = meanmovingFFT_sorteddP.process_arrays_with_nan(fft_xlist, np.mean)
-        fft_y = meanmovingFFT_sorteddP.process_arrays_with_nan(fft_ylist, np.mean)
+        fft_x = meanmovingFFT_sorteddP.process_arrays(fft_xlist, np.nanmean)
+        fft_y = meanmovingFFT_sorteddP.process_arrays(fft_ylist, np.nanmean)
         
         # 音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -107,7 +107,7 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         # プロットの設定
         plt.xscale('log')
         plt.yscale('log')
-        plt.ylim(1e-8, 1e8)
+        plt.ylim(1e-6, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'dP <{dP_Ulimit}.timerange={timerange}s')

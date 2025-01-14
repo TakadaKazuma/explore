@@ -16,13 +16,13 @@ import meanFFT_sorteddP
 import Dispersion_Relation
 import nearmovingFFT
 
-def process_arrays_with_nan(arrays, operation):
+def process_arrays(arrays, operation):
     '''
-    指定された操作を各列に操作する関数。
-    1つでもNanが含まれている列の演算結果はNanになる
+    空の行を除外した後、各行の長さ要素数が同じであることを確認し、
+    列(axis=0)に対して指定された操作する関数。
 
     arrays:多次元データ(各行の長さが一致している必要あり)
-    operation:施す操作 (例) median, np.max…など
+    operation:施す操作 (例) np.sum, np.max…など
     '''
     # 空配列を除外
     if not arrays or any(len(arr) == 0 for arr in arrays):
@@ -32,14 +32,10 @@ def process_arrays_with_nan(arrays, operation):
     length = len(arrays[0])
     if not all(len(arr) == length for arr in arrays):
         raise ValueError("All arrays must have the same length")
+    
+    #配列に変換し、指定された操作を施す
+    result = operation(np.array(arrays), axis=0)
 
-    # 列ごとの処理：NaNが含まれる列の結果をNaNに
-    result = []
-    for values in zip(*arrays):  #
-        if any(np.isnan(values)): 
-            result.append(np.nan)
-        else:
-            result.append(operation(values))
     return result
 
 def process_movingFFTlist_dP(dP_Ulimit, timerange, interval, windowsize):
@@ -120,10 +116,10 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
             raise ValueError("No data")
         
         # パワースペクトルとその移動平均のケース平均の導出
-        fft_x = process_arrays_with_nan(fft_xlist, np.mean)
-        fft_y = process_arrays_with_nan(fft_ylist, np.mean) 
-        moving_fft_x = process_arrays_with_nan(moving_fft_xlist, np.mean)
-        moving_fft_y = process_arrays_with_nan(moving_fft_ylist, np.mean)
+        fft_x = process_arrays(fft_xlist, np.nanmean)
+        fft_y = process_arrays(fft_ylist, np.nanmean) 
+        moving_fft_x = process_arrays(moving_fft_xlist, np.nanmean)
+        moving_fft_y = process_arrays(moving_fft_ylist, np.nanmean)
         
         # 音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -131,6 +127,7 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
         # プロットの設定
         plt.xscale('log')
         plt.yscale('log')
+        plt.ylim(1e-4,1e1)
         plt.plot(fft_x, fft_y, label='FFT')    
         plt.plot(moving_fft_x, moving_fft_y, label='FFT_Movingmean')
         plt.axvline(x=w, color='r', label='border')

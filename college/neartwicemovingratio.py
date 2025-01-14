@@ -151,10 +151,10 @@ def plot_twicemovingratio(ID, timerange, interval, windowsize_FFT, windowsize_ra
         #保存の設定
         output_dir = f'neartwicemovingratio_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize={windowsize_ratio},twicemovingratio.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio},twicemovingratio.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize={windowsize_ratio},twicemovingratio.png")
+        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio},twicemovingratio.png")
         
         return twice_moving_fft_x, moving_ratio, sol
     
