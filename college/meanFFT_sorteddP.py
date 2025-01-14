@@ -107,7 +107,7 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         # プロットの設定
         plt.xscale('log')
         plt.yscale('log')
-        plt.ylim(1e-8, 1e8)
+        plt.ylim(1e-6, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'dP <{dP_Ulimit}.timerange={timerange}s')

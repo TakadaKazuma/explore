@@ -113,7 +113,7 @@ def plot_nearFFT(ID, timerange, interval):
         #描画の設定
         plt.xscale('log')
         plt.yscale('log')
-        plt.ylim(1e-8,1e8)
+        plt.ylim(1e-8,1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'FFT_ID={ID}, sol={sol}, time_range={timerange}s')

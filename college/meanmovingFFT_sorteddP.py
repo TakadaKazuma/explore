@@ -127,6 +127,7 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
         # プロットの設定
         plt.xscale('log')
         plt.yscale('log')
+        plt.ylim(1e-4,1e1)
         plt.plot(fft_x, fft_y, label='FFT')    
         plt.plot(moving_fft_x, moving_fft_y, label='FFT_Movingmean')
         plt.axvline(x=w, color='r', label='border')
