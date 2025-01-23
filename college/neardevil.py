@@ -7,6 +7,7 @@ import os
 import argparse as argparse
 import DATACATALOG
 import dailychange_p
+import nearFFT
 
 def get_sol_MUTC(ID):
     '''
@@ -71,8 +72,13 @@ def process_neardevildata(ID, time_range, interval):
         if near_devildata is None:
             raise ValueError("")
         
-        #「countdown」カラムの追加
-        near_devildata = caluculate_countdown(near_devildata)
+        near_devildata = nearFFT.caluculate_residual(near_devildata)
+        '''
+        「countdown」、「p-pred」、「residual」カラムの追加
+        countdown:経過時間(秒) ※countdown ≦ 0
+        p-pred:線形回帰の結果(気圧(Pa))
+        residual:残差
+        '''
         
         return near_devildata, sol
     
@@ -82,7 +88,8 @@ def process_neardevildata(ID, time_range, interval):
 
 def plot_neardevil(ID, time_range, interval):
     '''
-    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを描画した画像を保存する関数
+    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における、
+    気圧の時系列データ及びその線形回帰の結果を描画した画像を保存する関数
     ※横軸:countdown(s) 縦軸:気圧(Pa)
 
     ID:ダストデビルに割り振られた通し番号
@@ -98,6 +105,8 @@ def plot_neardevil(ID, time_range, interval):
         #描画の設定
         plt.plot(near_devildata['countdown'],near_devildata['p'],
                  label='true_value')
+        plt.plot(near_devildata['countdown'],near_devildata['p-pred'],
+                 label='Linearize_value')
         plt.xlabel('Time until devil starts [s]')
         plt.ylabel('Pressure [Pa]')
         plt.title(f'ID={ID},sol={sol}')
