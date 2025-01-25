@@ -39,5 +39,7 @@ meanratio_dp_*s
 
 meanmovingratio_dP_*s_windowsize*
 
+focuschange(*)_p
+
 #ログテキストファイル
 Errorlog*.txt
