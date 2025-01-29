@@ -85,6 +85,7 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
     '''
     AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たす全て事象の時系列データを加工し、
     求められるFFTをケース平均したものを描画した画像を保存する関数
+    横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     AT_Llimit:下限の基準となる大気の温度(K) (int型)
     Ws_Ulimit:上限の基準となる風速(m/s) (int型)
