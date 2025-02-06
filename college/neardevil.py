@@ -104,11 +104,11 @@ def plot_neardevil(ID, timerange, interval):
                  label='true_value')
         plt.plot(near_devildata['countdown'],near_devildata['p-pred'],
                  label='Linearize_value')
-        plt.xlabel('Time until devil starts [s]')
-        plt.ylabel('Pressure [Pa]')
-        plt.title(f'ID={ID},sol={sol}')
+        plt.xlabel('Time until devil starts [s]', fontsize=15)
+        plt.ylabel('Pressure [Pa]', fontsize=15)
+        plt.title(f'ID={ID},sol={sol}', fontsize=15)
         plt.grid(True)
-        plt.legend()
+        plt.legend(fontsize=15)
         plt.tight_layout()
         
         #保存の設定

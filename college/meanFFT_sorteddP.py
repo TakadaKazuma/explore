@@ -108,11 +108,11 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         plt.ylim(1e-6, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'dP <{dP_Ulimit}.timerange={timerange}s')
-        plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel(f'Pressure Power [$Pa^2$]')
+        plt.title(f'dP <{dP_Ulimit}.timerange={timerange}s', fontsize=15)
+        plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
+        plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)
-        plt.legend()
+        plt.legend(fontsize=15)
         plt.tight_layout()
         
         # 保存の設定

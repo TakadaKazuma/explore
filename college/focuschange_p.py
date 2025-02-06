@@ -73,9 +73,9 @@ def plot_focuschange_p(sol, LTST_h, timerange):
             label='true_value')
         plt.plot(focus_data["countdown"],focus_data["p-pred"],
             label='Linearize_value')
-        plt.title(f'sol={sol},({LTST_h}~_{timerange}s) ')
-        plt.xlabel('Time')
-        plt.ylabel('Pressure [Pa]')
+        plt.title(f'sol={sol},({LTST_h}~_{timerange}s)', fontsize=15)
+        plt.xlabel('Local Time', fontsize=15)
+        plt.ylabel('Pressure [Pa]', fontsize=15)
         plt.grid(True)
         
         #保存の設定

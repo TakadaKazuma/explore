@@ -71,7 +71,7 @@ def plot_focusFFT(sol, LTST_h, timerange):
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'FFT_sol={sol},({LTST_h}~_{timerange}s) ')
         plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel(f'Pressure Power [$Pa^2&]')
+        plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
         plt.tight_layout()
         plt.legend()

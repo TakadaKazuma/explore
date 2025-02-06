@@ -112,10 +112,10 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'AT >{AT_Llimit},Ws<{Ws_Ulimit}(time_range={timerange}(s))')
-        plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel('Pressure Amplitude [Pa]')
+        plt.xlabel('Vibration Frequency [Hz]',fontsize=15)
+        plt.ylabel('Pressure Amplitude [Pa]', fontsize=15)
         plt.grid(True)
-        plt.legend()
+        plt.legend(fontsize=15)
         plt.tight_layout()
         
         # 保存の設定

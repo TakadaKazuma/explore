@@ -78,11 +78,11 @@ def plot_ratio(ID, timerange, interval, windowsize_FFT):
         plt.xscale('log')
         plt.plot(moving_fft_x, ratio, label='Ratio')
         plt.axvline(x=w, color='r', label='Border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, timerange={timerange}s')
-        plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel(f'Pressure Power Ratio')
+        plt.title(f'FFT_ID={ID}, sol={sol}, timerange={timerange}s', fontsize=15)
+        plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
+        plt.ylabel(f'Pressure Power Ratio', fontsize=15)
         plt.grid(True)
-        plt.legend()
+        plt.legend(fontsize=15)
         plt.tight_layout()
         
         #保存の設定

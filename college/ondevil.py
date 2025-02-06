@@ -67,8 +67,8 @@ def plot_ondevil(ID, timerange):
         
         #描画の設定
         plt.plot(on_devildata['countdown'],on_devildata['p'])
-        plt.xlabel('Time until devil [s]')
-        plt.ylabel('Pressure [Pa]')
+        plt.xlabel('Time until devil [s]', fontsize=15)
+        plt.ylabel('Pressure [Pa]', fontsize=15)
         plt.title(f'ID={ID},sol={sol}')
         plt.grid(True)    
         plt.tight_layout()

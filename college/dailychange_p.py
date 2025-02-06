@@ -91,9 +91,9 @@ def plot_dailychange_p(sol):
         #プロットの設定
         plt.tight_layout()
         data.plot(x='Time',y='p')
-        plt.title(f'sol={sol}')
-        plt.xlabel('Time')
-        plt.ylabel('Pressure [Pa]')
+        plt.title(f'sol={sol}', fontsize=15)
+        plt.xlabel('Time', fontsize=15)
+        plt.ylabel('Pressure [Pa]',fontsize=15)
         plt.grid(True)
         
         #保存の設定

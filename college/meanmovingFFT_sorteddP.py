@@ -128,11 +128,11 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
         plt.plot(fft_x, fft_y, label='FFT')    
         plt.plot(moving_fft_x, moving_fft_y, label='FFT_Movingmean')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'dP <{dP_Ulimit},time_range={timerange}s')
-        plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel(f'Pressure Power [$Pa^2$]')
+        plt.title(f'dP <{dP_Ulimit},time_range={timerange}s', fontsize=15)
+        plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
+        plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)
-        plt.legend()
+        plt.legend(fontsize=15)
         plt.tight_layout()
         
         # 保存の設定
