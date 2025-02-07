@@ -105,7 +105,7 @@ def plot_nearFFT(ID, time_range, interval):
     '''
     try:
         #パワースペクトルの導出
-        fft_x, fft_y, sol = process_nearFFT(ID, time_range, interval)
+        fft_x, fft_y, moving_fft_x, moving_fft_y, sol = process_nearFFT(ID, time_range, interval)
         
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -116,12 +116,13 @@ def plot_nearFFT(ID, time_range, interval):
         plt.ylim(1e-8,1e8)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={time_range}s')
-        plt.xlabel('Vibration Frequency [Hz]')
-        plt.ylabel(f'Pressure Power [$Pa^2&]')
+        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={time_range}s',fontsize=15)
+        plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
+        plt.ylabel(f'Pressure Power [$Pa^2&]', fontsize=15)
         plt.grid(True)
+        plt.legend(fontsize=15)
         plt.tight_layout()
-        plt.legend()
+
         
         #保存の設定
         output_dir = f'nearFFT_{time_range}s'
