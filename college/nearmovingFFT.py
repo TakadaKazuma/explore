@@ -30,6 +30,8 @@ def moving_FFT(data, windowsize):
     また、今回扱うケースにおいては低周波側のパワーが高周波側より強い傾向がある。しかし、本研究では高周波側に注目したい。
     そのため、移動平均を算出する際に低周波側から受ける影響を軽減するために、
     パワーの常用対数の移動平均を算出し、対数を外して元に戻したものを、パワーの移動平均とした。
+    ※パワースペクトルの各要素及び長さは、それ自体に意味があるため、ケース平均した際にその情報が壊れないようにするため、
+    正確な移動平均の値が計算できない要素にはnanを代入し、形状を維持するようにしている。
     '''
     #パワーの常用対数を算出
     log10_fft_y = np.log10(fft_y)
@@ -53,16 +55,16 @@ def moving_FFT(data, windowsize):
     
     return fft_x, fft_y ,moving_fft_x, moving_fft_y
 
-def process_movingFFT(ID, timerange, interval, windowsize):
+def process_movingFFT(ID, time_range, interval, windowsize):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を導出し、
+    これに伴い、導出できる残差に対して、パワースペクトルの移動平均を導出し、
     その結果(各々ndarray)及び対応するsol(int型)を返す関数
 
     ID:ダストデビルに割り振られた通し番号
-    timerange:時間間隔(切り出す時間)(秒)(int型)
-    interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
+    time_range:時間間隔(切り取る時間)(秒)(int型)
+    interval:ラグ(何秒前から切り取るか)(秒)(int型)
+    window_size:移動平均を計算する際の窓数(int型)
     '''
     try:
         #IDに対応するsol及びMUTCを取得
@@ -87,29 +89,30 @@ def process_movingFFT(ID, timerange, interval, windowsize):
         '''
         
         #パワースペクトルとその移動平均の導出
-        fft_x, fft_y, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, windowsize)
+        _, _, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, windowsize)
 
-        return fft_x, fft_y, moving_fft_x, moving_fft_y, sol
+        return  moving_fft_x, moving_fft_y, sol
     
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
 
+
 def plot_movingFFT(ID, timerange, interval, windowsize):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を計算し、それらを描画した画像を保存する関数
+    これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を計算し、それらを描画する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     ID:ダストデビルに割り振られた通し番号
-    timerange:時間間隔(切り出す時間)(秒)(int型)
-    interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
+    time_range:時間間隔(切り取る時間)(秒)(int型)
+    interval:ラグ(何秒前から切り取るか)(秒)(int型)
+    window_size:移動平均を計算する際の窓数(int型)
 
     '''
     try:
         #パワースペクトルとその移動平均の導出
-        fft_x, fft_y, moving_fft_x, moving_fft_y, sol = process_movingFFT(ID, timerange, interval, windowsize)
+        fft_x, fft_y, moving_fft_x, moving_fft_y, sol = process_movingFFT(ID, time_range, interval, windowsize)
         
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -117,15 +120,13 @@ def plot_movingFFT(ID, timerange, interval, windowsize):
         #描画の設定
         plt.xscale('log')
         plt.yscale('log')
-        plt.ylim(1e-8,1e2)
-        plt.plot(fft_x, fft_y, label='FFT')
         plt.plot(moving_fft_x, moving_fft_y,label='FFT_Moving_mean')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={timerange}s', fontsize=15)
-        plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
-        plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
+        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={time_range}s')
+        plt.xlabel('Vibration Frequency [Hz]')
+        plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
-        plt.legend(fontsize=15)
+        plt.legend()
         plt.tight_layout()
         
         #保存の設定
@@ -136,17 +137,15 @@ def plot_movingFFT(ID, timerange, interval, windowsize):
         plt.close()
         print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingFFT.png")
         
-        return fft_x, fft_y, moving_fft_x, moving_fft_y
+        return moving_fft_x, moving_fft_y
     
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
     
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the moving average of the power spectrum corresponding to the ID")
-    parser.add_argument('ID', type=int, help="ID") #IDの指定
-    parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
-    #パワースペクトルの移動平均を計算する際の窓数の指定
+    parser = argparse.ArgumentParser(description="Plot Power Spectrum corresponding to the ID")
+    parser.add_argument('ID', type=int, help="ID") 
     parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average")
     args = parser.parse_args()
-    plot_movingFFT(args.ID, args.timerange, 20, args.windowsize)
+    plot_movingFFT(args.ID, 7200, 20, args.windowsize)
