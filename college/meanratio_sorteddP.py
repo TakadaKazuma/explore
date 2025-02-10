@@ -24,7 +24,7 @@ def process_ratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
     ※dP, dP_max < 0
     timerange:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
+    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     #記録用配列の作成
     moving_fft_xlist, ratiolist = [], []
@@ -86,7 +86,7 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
     ※dP, dP_max < 0
     timerange:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
+    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     try:
         #対応する全事象のパワースペクトルとその移動平均の比をリスト化したものの導出

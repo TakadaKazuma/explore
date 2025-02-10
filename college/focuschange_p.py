@@ -101,4 +101,4 @@ if __name__ == "__main__":
     #ダストデビルが発生しなかったが、時系列データが存在するの気圧変化の描画
     nodevilsollist = nodevil.process_nodevilsollist()
     for sol in tqdm(nodevilsollist, desc="Processing nosdevil sols"):
-        plot_focuschange_p(sol, args.MUTC_h, args.timerange) 
+        plot_focuschange_p(sol, args.MUTC_h, args.timerange)

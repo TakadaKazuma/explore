@@ -13,7 +13,7 @@ import nearmovingFFT
 def calculate_movingave(x, y, windowsize):
     '''
     x及びyの移動平均を算出する関数
-    ※用途は主にmovingratio移動平均を算出
+    ※用途は主にratioの移動平均を算出
 
     x:移動平均を算出したいndarray
     y:xと対をなす移動平均を算出したいndarray

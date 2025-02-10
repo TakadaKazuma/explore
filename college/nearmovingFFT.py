@@ -40,7 +40,6 @@ def moving_FFT(data, windowsize):
 
     #窓数に対応する、片側において移動平均をできない要素の数
     pad_size = (windowsize - 1) // 2
-    pad_size = (windowsize - 1) // 2
     
     #fft_x及びfft_yの要素数に統一したndarray(要素は全てnan)を作成
     moving_fft_x = np.full(fft_x.shape, np.nan)
@@ -55,7 +54,7 @@ def moving_FFT(data, windowsize):
     
     return fft_x, fft_y ,moving_fft_x, moving_fft_y
 
-def process_movingFFT(ID, time_range, interval, windowsize):
+def process_movingFFT(ID, timerange, interval, windowsize_FFT):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、パワースペクトルの移動平均を導出し、
@@ -64,7 +63,7 @@ def process_movingFFT(ID, time_range, interval, windowsize):
     ID:ダストデビルに割り振られた通し番号
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
-    window_size:移動平均を計算する際の窓数(int型)
+    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     try:
         #IDに対応するsol及びMUTCを取得
@@ -89,16 +88,16 @@ def process_movingFFT(ID, time_range, interval, windowsize):
         '''
         
         #パワースペクトルとその移動平均の導出
-        _, _, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, windowsize)
+        fft_x, fft_y, moving_fft_x, moving_fft_y = moving_FFT(near_devildata, windowsize_FFT)
 
-        return  moving_fft_x, moving_fft_y, sol
+        return  fft_x, fft_y, moving_fft_x, moving_fft_y, sol
     
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
 
 
-def plot_movingFFT(ID, timerange, interval, windowsize):
+def plot_movingFFT(ID, timerange, interval, windowsize_FFT):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を計算し、それらを描画する関数
@@ -107,12 +106,11 @@ def plot_movingFFT(ID, timerange, interval, windowsize):
     ID:ダストデビルに割り振られた通し番号
     time_range:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
-    window_size:移動平均を計算する際の窓数(int型)
-
+    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     try:
         #パワースペクトルとその移動平均の導出
-        fft_x, fft_y, moving_fft_x, moving_fft_y, sol = process_movingFFT(ID, time_range, interval, windowsize)
+        fft_x, fft_y, moving_fft_x, moving_fft_y, sol = process_movingFFT(ID, timerange, interval, windowsize_FFT)
         
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -120,9 +118,10 @@ def plot_movingFFT(ID, timerange, interval, windowsize):
         #描画の設定
         plt.xscale('log')
         plt.yscale('log')
+        #plt.plot(fft_x, fft_y, label='FFT')
         plt.plot(moving_fft_x, moving_fft_y,label='FFT_Moving_mean')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={time_range}s')
+        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={timerange}s')
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
@@ -130,7 +129,7 @@ def plot_movingFFT(ID, timerange, interval, windowsize):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'nearmovingFFT_{timerange}s_windowsize={windowsize}'
+        output_dir = f'nearmovingFFT_{timerange}s_windowsize={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingFFT.png"))
         plt.clf()

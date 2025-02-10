@@ -114,7 +114,7 @@ def plot_nearFFT(ID, timerange, interval):
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'FFT_ID={ID}, sol={sol}, time_range={timerange}s')
-        plt.xlabel('Vibration Frequency [Hz]'、fontsize=15)
+        plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2&]', fontsize=15)
         plt.grid(True)
         plt.legend(fontsize=15)
@@ -129,7 +129,7 @@ def plot_nearFFT(ID, timerange, interval):
         print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_nearFFT.png")
         
         return fft_x, fft_y
-    
+
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
