@@ -1,3 +1,4 @@
+import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
@@ -6,17 +7,19 @@ import focuschange_p
 import nodevil
 from tqdm import tqdm
 import nearFFT
+import nearmovingFFT
 import Dispersion_Relation
 
-def process_focusFFT(sol, MUTC_h, timerange):
+def process_focusratio(sol, MUTC_h, timerange, windowsize_FFT):
     '''
     sol,時刻MUTC_hからtimerange秒間に対応する気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、
-    FFTを用いてパワースペクトルを導出(各々ndarray)及び対応するsol(int型)を返す関数
+    FFTを用いてパワースペクトルとその移動平均の比を導出(各々ndarray)する関数
 
-    ID:ダストデビルに割り振られた通し番号
+    sol:取り扱う火星日(探査機到着後からの経過日数)(int型)
+    MUTC_h:基準となる開始時刻(int型)(0 ≦ MUTC_h ≦ 23)
     timerange:時間間隔(切り取る時間)(秒)(int型)
-    interval:ラグ(何秒前から切り取るか)(秒)(int型)
+    windosize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     try:
         #該当する時系列データの取得
@@ -32,68 +35,71 @@ def process_focusFFT(sol, MUTC_h, timerange):
         residual:残差
         '''
         
-        #パワースペクトルの導出
-        fft_x, fft_y = nearFFT.FFT(focus_data)
+        #パワースペクトルとその移動平均の導出
+        _, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(focus_data, windowsize_FFT)
+        
+        #比の算出
+        ratio = fft_y/moving_fft_y
 
-        return fft_x, fft_y
+        return moving_fft_x, ratio
     
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
 
-def plot_focusFFT(sol, MUTC_h, timerange):
+def plot_focusratio(sol, MUTC_h, timerange, windowsize_FFT):
     '''
     sol,時刻MUTC_hからtimerange秒間に対応する気圧の時系列データに線形回帰を実行。
     これに伴い、導出できる残差に対して、
-    FFTを用いてパワースペクトル(ndarray)を導出及び対応するsol(int型)を導出し、
-    それを描画した画像を保存する関数。
-    横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
+    FFTを用いてパワースペクトルとその移動平均の比を導出(各々ndarray)を描画した画像を保存する関数
+    横軸:周波数(Hz) 縦軸:スペクトル強度の比
 
     sol:取り扱う火星日(探査機到着後からの経過日数)(int型)
     MUTC_h:基準となる開始時刻(int型)(0 ≦ MUTC_h ≦ 23)
     timerange:時間間隔(切り取る時間)(秒)(int型)
-    '''  
+    windosize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
+    '''
     try:
-        #パワースペクトルの導出
-        fft_x, fft_y = process_focusFFT(sol, MUTC_h, timerange)
+        #パワースペクトルとその移動平均の導出
+        moving_fft_x, ratio = process_focusratio(sol, MUTC_h, timerange, windowsize_FFT)
         
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
         
         #描画の設定
         plt.xscale('log')
-        plt.yscale('log')
-        plt.ylim(1e-8,1e2)
-        plt.plot(fft_x, fft_y, label='FFT')
+        plt.plot(moving_fft_x, ratio,label='ratio', fontsize=15)
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_sol={sol},({MUTC_h}~_{timerange}s)', fontsize=15)
+        plt.title(f'ratio_sol={sol},({MUTC_h}~_{timerange}s)', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
-        plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
+        plt.ylabel('Pressure Power Ratio', fontsize=15)
         plt.grid(True)
+        plt.legend(fontsize=15)
         plt.tight_layout()
-        plt.legend()
         
         #保存の設定
-        output_dir = f'focusFFT({MUTC_h}~_{timerange}s)'
+        output_dir = f'focusmovingratio({MUTC_h}~_{timerange}s)_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"FFT_sol={sol},({MUTC_h}~_{timerange}s)_focusFFT.png"))
+        plt.savefig(os.path.join(output_dir,f"ratio_sol={sol},({MUTC_h}~_{timerange}s)_focusmovingratio.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},({MUTC_h}~_{timerange}s)_focusFFT.png")
+        print(f"Save completed: sol={str(sol).zfill(4)},({MUTC_h}~_{timerange}s)_focusmovingratio.png")
         
-        return fft_x, fft_y
+        return moving_fft_x, ratio
     
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
-
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="plot focus pressure changes corresponding to the sol, LTST_h and timerange")
-    parser.add_argument('LTST_h', type=int, help='Base start time') #基準となる開始の時間
+    parser.add_argument('MUTC_h', type=int, help='Base start time') #基準となる開始の時間
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
+    parser.add_argument('windowsize_FFT', type=int, help="The [windowsize] used to calculate the moving average of FFT")
+    #パワースペクトルとその移動平均の比の移動平均を計算する際の窓数の指定
     args = parser.parse_args()
     
     #ダストデビルのないsolを描画
     nodevilsollist = nodevil.process_nodevilsollist()
     for sol in tqdm(nodevilsollist, desc="Processing nodevil sols"):
-        plot_focusFFT(sol, args.LTST_h, args.timerange)
+        plot_focusratio(sol, args.LTST_h, args.timerange, args.windowsize_FFT) 

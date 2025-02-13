@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import argparse as argparse
 import focuschange_p
+import nodevil
 from tqdm import tqdm
 import nearFFT
 import nearmovingFFT
@@ -50,9 +51,10 @@ def plot_focusmovingFFT(sol, MUTC_h, timerange, windowsize_FFT):
     それを描画した画像を保存する関数。
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
-    ID:ダストデビルに割り振られた通し番号
+    sol:取り扱う火星日(探査機到着後からの経過日数)(int型)
+    MUTC_h:基準となる開始時刻(int型)(0 ≦ MUTC_h ≦ 23)
     timerange:時間間隔(切り取る時間)(秒)(int型)
-    interval:ラグ(何秒前から切り取るか)(秒)(int型)
+    windosize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''  
     try:
         #パワースペクトルとその移動平均の導出
@@ -96,7 +98,6 @@ if __name__ == "__main__":
     parser.add_argument('windowsize_FFT', type=int, 
                         help="The [windowsize] used to calculate the moving average of FFT")  #パワースペクトルとその移動平均を計算する際の窓数の指定
     args = parser.parse_args()
-    
     #ダストデビルのないsolを描画
     nodevilsollist = nodevil.process_nodevilsollist()
     for sol in tqdm(nodevilsollist, desc="Processing nodevil sols"):
