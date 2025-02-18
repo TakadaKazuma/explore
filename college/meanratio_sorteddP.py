@@ -18,7 +18,7 @@ import meanmovingFFT_sorteddP
 def process_ratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
     '''
     dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルとその移動平均の比をリスト化したものを返す関数
+    全ての「パワースペクトルとその移動平均の比」を列挙したリストを返す関数
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_max < 0
@@ -79,7 +79,7 @@ def process_ratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
 def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
     '''
     dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルとその移動平均の比の描画した画像を保存する関数
+    「パワースペクトルとその移動平均の比」の平均を描画した画像を保存する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度の比
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)

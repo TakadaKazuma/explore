@@ -10,11 +10,12 @@ import Dispersion_Relation
 
 def process_focusFFT(sol, MUTC_h, timerange):
     '''
-    sol,時刻MUTC_hからtimerange秒間に対応する気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、
-    FFTを用いてパワースペクトルを導出(各々ndarray)及び対応するsol(int型)を返す関数
+    sol,MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを対象とし、
+    気圧変化の線形回帰から導かれる残差に対して、
+    パワースペクトルを返す関数。
 
-    ID:ダストデビルに割り振られた通し番号
+    sol:取り扱う火星日(探査機到着後からの経過日数)(int型)
+    MUTC_h:基準となる開始時刻(int型)(0 ≦ MUTC_h ≦ 23)
     timerange:時間間隔(切り取る時間)(秒)(int型)
     interval:ラグ(何秒前から切り取るか)(秒)(int型)
     '''
@@ -43,10 +44,9 @@ def process_focusFFT(sol, MUTC_h, timerange):
 
 def plot_focusFFT(sol, MUTC_h, timerange):
     '''
-    sol,時刻MUTC_hからtimerange秒間に対応する気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、
-    FFTを用いてパワースペクトル(ndarray)を導出及び対応するsol(int型)を導出し、
-    それを描画した画像を保存する関数。
+    sol,MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを対象とし、
+    気圧変化の線形回帰から導かれる残差に対して、
+    パワースペクトルを描画した画像を保存する関数。
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     sol:取り扱う火星日(探査機到着後からの経過日数)(int型)
@@ -89,11 +89,11 @@ def plot_focusFFT(sol, MUTC_h, timerange):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="plot focus pressure changes corresponding to the sol, LTST_h and timerange")
-    parser.add_argument('LTST_h', type=int, help='Base start time') #基準となる開始の時間
+    parser.add_argument('MUTC_h', type=int, help='Base start time') #基準となる開始の時間
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
     
     #ダストデビルのないsolを描画
     nodevilsollist = nodevil.process_nodevilsollist()
     for sol in tqdm(nodevilsollist, desc="Processing nodevil sols"):
-        plot_focusFFT(sol, args.LTST_h, args.timerange)
+        plot_focusFFT(sol, args.MUTC_h, args.timerange)

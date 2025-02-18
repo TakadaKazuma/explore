@@ -26,8 +26,8 @@ def process_IDlist_dP(dP_Ulimit):
 
 def process_FFTlist_dP(dP_Ulimit, timerange, interval):
     '''
-    dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルをリスト化したものを返す関数
+    dP_Ulimit > dP を満たすダストデビル全ての時系列データを加工し、
+    全てのパワースペクトルを列挙したリストを返す関数
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_Ulimit < 0
@@ -80,8 +80,8 @@ def process_FFTlist_dP(dP_Ulimit, timerange, interval):
 
 def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
     '''
-    dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルをケース平均し、それの描画した画像を保存する関数
+    dP_Ulimit > dP を満たすダストデビル全ての時系列データを加工し、
+    パワースペクトルの平均を描画及び保存する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)

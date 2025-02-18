@@ -37,8 +37,8 @@ def process_arrays(arrays, operation):
 
 def process_movingFFTlist_dP(dP_Ulimit, timerange, interval, windowsize):
     '''
-    dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルとその移動平均をリスト化したものを返す関数
+    dP_Ulimit > dP を満たすダストデビル全ての時系列データを加工し、
+    全てのパワースペクトルの移動平均を列挙したリストを返す関数
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_Ulimit < 0
@@ -96,8 +96,8 @@ def process_movingFFTlist_dP(dP_Ulimit, timerange, interval, windowsize):
 
 def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
     '''
-    dP_max > dP かつ Ws-ave<Ws_min を満たす全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルとその移動平均のケース平均を算出し、それの描画した画像を保存する関数
+    dP_Ulimit > dP を満たすダストデビル全ての時系列データを加工し、
+    パワースペクトルの移動平均を平均し、それを描画及び保存する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)

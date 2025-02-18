@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 def filter_focusdata(data, sol, MUTC_h, timerange):
     '''
-    与えられた時系列データを指定されMUTC_hからtimerange秒間のデータを返す関数(dataframe型)
+    与えられた時系列データを指定されたMUTC_hからtimerange秒間のデータを返す関数(dataframe型)
 
     data:気圧の時系列データ(dataframe)
     sol:取り扱う火星日(探査機到着後からの経過日数)(int型)

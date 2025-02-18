@@ -14,12 +14,13 @@ import nearmovingratio
 
 def process_movingresampleratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
     '''
-    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを0.5秒間隔でresampleした後に、線形回帰を実行。
-    これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を導出し、
-    それらの比に対して再度移動平均を算出したもの(ndarray型)及び対応するsol(int型)を返す関数
-    
+    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを対象とし、
+    0.5秒間隔でのリサンプリングを行った後、気圧変化の線形回帰から導かれる残差に対して、
+    「パワースペクトルとその移動平均の比(パワースペクトル比)」が算出できる。
+    更にパワースペクトル比に対して、
+    再度移動平均をとった修正パワースペクトル及び対応するsolを返す関数
 
-    ID:ダストデビルに割り振られた通し番号
+    ID:ダストデビルに割り振られた通し番号(int型)
     timerange:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
     windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
@@ -67,11 +68,14 @@ def process_movingresampleratio(ID, timerange, interval, windowsize_FFT, windows
 
 def plot_movingratio_resample(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
     '''
-    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを0.5秒間隔でresampleした後、線形回帰を実行
-    これに伴い、導出できる残差に対して、パワースペクトルとその移動平均を導出し、
-    それらの比に対して再度移動平均を算出したものを描画した画像を保存する関数
+    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを対象とし、
+    0.5秒間隔でのリサンプリングを行った後、気圧変化の線形回帰から導かれる残差に対して、
+    「パワースペクトルとその移動平均の比(パワースペクトル比)」が算出できる。
+    更にパワースペクトル比に対して、
+    再度移動平均をとった修正パワースペクトルを描画した画像を保存する関数。
+    横軸:周波数(Hz) 縦軸:スペクトル強度の比
 
-    ID:ダストデビルに割り振られた通し番号
+    ID:ダストデビルに割り振られた通し番号(int型)
     timerange:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
     windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)

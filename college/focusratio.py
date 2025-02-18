@@ -12,9 +12,9 @@ import Dispersion_Relation
 
 def process_focusratio(sol, MUTC_h, timerange, windowsize_FFT):
     '''
-    sol,時刻MUTC_hからtimerange秒間に対応する気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、
-    FFTを用いてパワースペクトルとその移動平均の比を導出(各々ndarray)する関数
+    sol,MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを対象とし、
+    気圧変化の線形回帰から導かれる残差に対して、
+    「パワースペクトルとその移動平均の比」を返す関数
 
     sol:取り扱う火星日(探査機到着後からの経過日数)(int型)
     MUTC_h:基準となる開始時刻(int型)(0 ≦ MUTC_h ≦ 23)
@@ -49,9 +49,9 @@ def process_focusratio(sol, MUTC_h, timerange, windowsize_FFT):
 
 def plot_focusratio(sol, MUTC_h, timerange, windowsize_FFT):
     '''
-    sol,時刻MUTC_hからtimerange秒間に対応する気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、
-    FFTを用いてパワースペクトルとその移動平均の比を導出(各々ndarray)を描画した画像を保存する関数
+    sol,MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを対象とし、
+    気圧変化の線形回帰から導かれる残差に対して、
+    「パワースペクトルとその移動平均の比」を描画した画像を保存する関数。
     横軸:周波数(Hz) 縦軸:スペクトル強度の比
 
     sol:取り扱う火星日(探査機到着後からの経過日数)(int型)
@@ -102,4 +102,4 @@ if __name__ == "__main__":
     #ダストデビルのないsolを描画
     nodevilsollist = nodevil.process_nodevilsollist()
     for sol in tqdm(nodevilsollist, desc="Processing nodevil sols"):
-        plot_focusratio(sol, args.LTST_h, args.timerange, args.windowsize_FFT) 
+        plot_focusratio(sol, args.MUTC_h, args.timerange, args.windowsize_FFT) 

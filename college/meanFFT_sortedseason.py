@@ -77,8 +77,8 @@ def process_arrays(arrays, operation):
 
 def process_FFTlist_season(ls, timerange, interval):
     '''
-    lsに対応する、疑似的なlsが一致している全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルをリスト化したものを返す関数
+    lsに対応する、疑似的なlsが一致しているダストデビル全ての時系列データを加工し、
+    全てのパワースペクトルを列挙したリストを返す関数
 
     ls:季節を表す指標 (int型)
     timerange:時間間隔(切り取る時間)(秒)(int型)
@@ -131,8 +131,8 @@ def process_FFTlist_season(ls, timerange, interval):
 
 def plot_meanFFT_season(ls, timerange, interval):
     '''
-    lsに対応する、疑似的なlsが一致している全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルをケース平均し、それの描画した画像を保存する関数
+    lsに対応する、疑似的なlsが一致しているダストデビル全ての時系列データを加工し、
+    パワースペクトルの平均を描画及び保存する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     ls:季節を表す指標 (int型)

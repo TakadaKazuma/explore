@@ -18,14 +18,15 @@ import meanmovingFFT_sorteddP
 def process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, windowsize_ratio):
     '''
     dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルとその移動平均の比の移動平均をリスト化したものを返す関数
+    全ての「パワースペクトルとその移動平均の比(パワースペクトル比)」に対して
+    再度移動平均を取った結果(修正パワースペクトル)を列挙したリストを返す関数
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_max < 0
     timerange:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
-    windowsize_ratio:パワースペクトルとその移動平均の比の移動平均を計算するときの窓数(int型)
+    windowsize_FFT:パワースペクトル比を計算する際の窓数(int型)
+    windowsize_ratio:修正パワースペクトルを計算する際の窓数窓数(int型)
     '''
     #記録用配列の作成
     twice_moving_fft_xlist, moving_ratiolist = [], []
@@ -80,11 +81,11 @@ def process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, w
 
 def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, windowsize_ratio):
     '''
-    dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
-    FFTを用いて導出したパワースペクトルとその移動平均の比の移動平均を平均したもの描画した画像を保存する関数
+    dP_Ulimit > dP  を満たす全て事象の時系列データを加工し、
+    全ての「パワースペクトルとその移動平均の比(パワースペクトル比)」に対して
+    再度移動平均を取った結果(修正パワースペクトル)の平均を描画及び捕損ずる関数
     横軸:周波数(Hz) 縦軸:スペクトル強度の比
     
-
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_max < 0
     timerange:時間間隔(切り出す時間)(秒)(int型)

@@ -11,9 +11,9 @@ import Dispersion_Relation
 
 def process_focusmovingFFT(sol, MUTC_h, timerange, windowsize_FFT):
     '''
-    sol,時刻MUTC_hからtimerange秒間に対応する気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、
-    FFTを用いてパワースペクトルとその移動平均を導出(各々ndarray)及び対応するsol(int型)を返す関数
+    sol,MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを対象とし、
+    気圧変化の線形回帰から導かれる残差に対して、
+    パワースペクトルとその移動平均を返す関数。
 
     sol:取り扱う火星日(探査機到着後からの経過日数)(int型)
     MUTC_h:基準となる開始時刻(int型)(0 ≦ MUTC_h ≦ 23)
@@ -45,10 +45,9 @@ def process_focusmovingFFT(sol, MUTC_h, timerange, windowsize_FFT):
     
 def plot_focusmovingFFT(sol, MUTC_h, timerange, windowsize_FFT):
     '''
-    sol,時刻MUTC_hからtimerange秒間に対応する気圧の時系列データに線形回帰を実行。
-    これに伴い、導出できる残差に対して、
-    FFTを用いてパワースペクトルとその移動平均を導出(各々ndarray)及び対応するsol(int型)を導出し、
-    それを描画した画像を保存する関数。
+    sol,MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを対象とし、
+    気圧変化の線形回帰から導かれる残差に対して、
+    パワースペクトルとその移動平均を描画した画像を保存する関数。
     横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
 
     sol:取り扱う火星日(探査機到着後からの経過日数)(int型)
@@ -93,7 +92,7 @@ def plot_focusmovingFFT(sol, MUTC_h, timerange, windowsize_FFT):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="plot focus pressure changes corresponding to the sol, LTST_h and timerange")
-    parser.add_argument('LTST_h', type=int, help='Base start time') #基準となる開始の時間
+    parser.add_argument('MUTC_h', type=int, help='Base start time') #基準となる開始の時間
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
     parser.add_argument('windowsize_FFT', type=int, 
                         help="The [windowsize] used to calculate the moving average of FFT")  #パワースペクトルとその移動平均を計算する際の窓数の指定
@@ -101,4 +100,4 @@ if __name__ == "__main__":
     #ダストデビルのないsolを描画
     nodevilsollist = nodevil.process_nodevilsollist()
     for sol in tqdm(nodevilsollist, desc="Processing nodevil sols"):
-        plot_focusmovingFFT(sol, args.LTST_h, args.timerange, args.windowsize_FFT) 
+        plot_focusmovingFFT(sol, args.MUTC_h, args.timerange, args.windowsize_FFT) 
