@@ -104,7 +104,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the ratio of the power pectrum to its moving average for the given ID")
     parser.add_argument('ID', type=int, help="ID") #IDの指定
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
-    #パワースペクトルの移動平均を計算する際の窓数の指定
-    parser.add_argument('windowsize_FFT', type=int, help="The [windowsize] used to calculate the moving average")
+    parser.add_argument('windowsize_FFT', type=int,
+                         help="The [windowsize] used to calculate the moving average")  #パワースペクトルの移動平均を計算する際の窓数の指定
     args = parser.parse_args()
     plot_ratio(args.ID, args.timerange, 20, args.windowsize_FFT)

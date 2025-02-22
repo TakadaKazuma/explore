@@ -145,7 +145,9 @@ def plot_movingFFT(ID, timerange, interval, windowsize_FFT):
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot Power Spectrum corresponding to the ID")
-    parser.add_argument('ID', type=int, help="ID") 
-    parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average")
+    parser.add_argument('ID', type=int, help="ID") #IDの指定
+    parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
+    parser.add_argument('windowsize_FFT', type=int, 
+                        help="The [windowsize] used to calculate the moving average") #パワースペクトルの移動平均を計算する際の窓数の指定
     args = parser.parse_args()
-    plot_movingFFT(args.ID, 7200, 20, args.windowsize)
+    plot_movingFFT(args.ID, args.timerange, 20, args.windowsize_FFT)

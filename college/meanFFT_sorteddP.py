@@ -130,7 +130,8 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the dP_Ulimit") 
-    parser.add_argument('dP_Ulimit', type=int, help="Serves as the standard for the upper limit of dP_ave(Negative int)") #dPの上限の指定(負)
+    parser.add_argument('dP_Ulimit', type=int, 
+                        help="Serves as the standard for the upper limit of dP_ave(Negative int)") #dPの上限の指定(負)
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
     plot_meanFFT_dP(args.dP_Ulimit, args.timerange, 20)

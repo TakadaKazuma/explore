@@ -95,8 +95,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="plot focus pressure changes corresponding to the sol, LTST_h and timerange")
     parser.add_argument('MUTC_h', type=int, help='Base start time') #基準となる開始の時間
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
-    parser.add_argument('windowsize_FFT', type=int, help="The [windowsize] used to calculate the moving average of FFT")
-    #パワースペクトルとその移動平均の比の移動平均を計算する際の窓数の指定
+    parser.add_argument('windowsize_FFT', type=int, 
+                        help="The [windowsize] used to calculate the moving average of FFT") #パワースペクトルとその移動平均の比の移動平均を計算する際の窓数の指定
     args = parser.parse_args()
     
     #ダストデビルのないsolを描画

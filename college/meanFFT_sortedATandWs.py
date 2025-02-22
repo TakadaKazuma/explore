@@ -133,8 +133,10 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the AT_Ulimit and Ws_Llimit")
-    parser.add_argument('AT_Ulimit', type=int, help="Serves as the standard for the upper limit of AT_ave(K)") #AT_aveの上限の指定
-    parser.add_argument('Ws_Llimit', type=int, help='Serves as the standard for the upper limit of Ws_ave(m/s)') #Ws_aveの下限の指定
+    parser.add_argument('AT_Ulimit', type=int, 
+                        help="Serves as the standard for the upper limit of AT_ave(K)") #AT_aveの上限の指定
+    parser.add_argument('Ws_Llimit', type=int, 
+                        help='Serves as the standard for the upper limit of Ws_ave(m/s)') #Ws_aveの下限の指定
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間範囲(切り出す時間)の指定
     args = parser.parse_args()
     plot_meanFFT_ATandWs(args.AT_Ulimit, args.Ws_Llimit, args.timerange, 20)

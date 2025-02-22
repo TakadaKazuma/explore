@@ -97,6 +97,7 @@ if __name__ == "__main__":
     parser.add_argument('windowsize_FFT', type=int, 
                         help="The [windowsize] used to calculate the moving average of FFT")  #パワースペクトルとその移動平均を計算する際の窓数の指定
     args = parser.parse_args()
+    
     #ダストデビルのないsolを描画
     nodevilsollist = nodevil.process_nodevilsollist()
     for sol in tqdm(nodevilsollist, desc="Processing nodevil sols"):

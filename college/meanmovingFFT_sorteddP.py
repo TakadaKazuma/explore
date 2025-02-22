@@ -152,7 +152,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the average moving power spectrum for each dP_Ulimit")
     parser.add_argument('dP_Ulimit', type=int, help="Maximum value of dP(Pa)(Negative)") #dPの上限の指定(負)
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
-    #パワースペクトルの移動平均を計算する際の窓数の指定
-    parser.add_argument('windowsize', type=int, help="The [windowsize] used to calculate the moving average")
+    parser.add_argument('windowsize', type=int, 
+                        help="The [windowsize] used to calculate the moving average") #パワースペクトルの移動平均を計算する際の窓数の指定
     args = parser.parse_args()
     plot_meanmovingFFT_dP(args.dP_Ulimit, args.timerange, 20, args.windowsize)
