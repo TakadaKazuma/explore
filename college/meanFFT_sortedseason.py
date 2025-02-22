@@ -158,7 +158,7 @@ def plot_meanFFT_season(ls, timerange, interval):
         plt.ylim(1e-6, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'meanFFT_{LS}≦ ls <{LS+30},time_range={timerange}s', fontsize=15)
+        plt.title(f'MPS_{LS}≦ ls <{LS+30},time_range={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)
@@ -168,10 +168,10 @@ def plot_meanFFT_season(ls, timerange, interval):
         # 保存の設定
         output_dir = f'meanFFT_sortedseason_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanFFT_ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png"))
+        plt.savefig(os.path.join(output_dir, f"meanFFT,ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanFFT_ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png")
+        print(f"Save completed: meanFFT,ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png")
         
         return fft_x, fft_y
 

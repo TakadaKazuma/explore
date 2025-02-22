@@ -83,7 +83,7 @@ def plot_focusmeanFFT(MUTC_h, timerange):
         plt.ylim(1e-6, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_(LTST_h={MUTC_h}~{timerange}s)')
+        plt.title(f'MPS_MURC={MUTC_h}~{timerange}s')
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
@@ -91,7 +91,7 @@ def plot_focusmeanFFT(MUTC_h, timerange):
         plt.tight_layout()
         
         # 保存の設定
-        output_dir = f'meanfocusFFT_({MUTC_h}~{timerange}s)'
+        output_dir = f'meanfocusFFT_MUTC={MUTC_h}~{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"meanfocusFFT_{timerange}s.png"))
         plt.clf()

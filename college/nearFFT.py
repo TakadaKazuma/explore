@@ -114,7 +114,7 @@ def plot_nearFFT(ID, timerange, interval):
         plt.ylim(1e-8,1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={timerange}s')
+        plt.title(f'PS_ID={ID}, sol={sol}, time_range={timerange}s')
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2&]', fontsize=15)
         plt.grid(True)
@@ -124,10 +124,10 @@ def plot_nearFFT(ID, timerange, interval):
         #保存の設定
         output_dir = f'nearFFT_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_nearFFT.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},nearFFT.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_nearFFT.png")
+        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},nearFFT.png")
         
         return fft_x, fft_y
 

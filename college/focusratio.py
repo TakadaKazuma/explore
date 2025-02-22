@@ -70,7 +70,7 @@ def plot_focusratio(sol, MUTC_h, timerange, windowsize_FFT):
         plt.xscale('log')
         plt.plot(moving_fft_x, ratio,label='ratio', fontsize=15)
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'ratio_sol={sol},({MUTC_h}~_{timerange}s)', fontsize=15)
+        plt.title(f'PSR_sol={sol},MUTC={MUTC_h}~{timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel('Pressure Power Ratio', fontsize=15)
         plt.grid(True)
@@ -78,7 +78,7 @@ def plot_focusratio(sol, MUTC_h, timerange, windowsize_FFT):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'focusmovingratio({MUTC_h}~_{timerange}s)_windowsize_FFT={windowsize_FFT}'
+        output_dir = f'focusmovingratio,MUTC={MUTC_h}~{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir,f"ratio_sol={sol},({MUTC_h}~_{timerange}s)_focusmovingratio.png"))
         plt.clf()

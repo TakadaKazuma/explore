@@ -92,7 +92,7 @@ def plot_movingratio_resample(ID, timerange, interval, windowsize_FFT, windowsiz
         plt.xscale('log')
         plt.plot(twice_moving_fft_x, moving_ratio, label='moving_ratio')        
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={timerange}(s)', fontsize=15)
+        plt.title(f'MPS_ID={ID}, sol={sol}, time_range={timerange}(s)', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel('Pressure Amplitude Ratio', fontsize=15)
         plt.grid(True)
@@ -102,10 +102,10 @@ def plot_movingratio_resample(ID, timerange, interval, windowsize_FFT, windowsiz
         #保存の設定
         output_dir = f'neartwicemovingresampleratio_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio}_movingresampleratio.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio},movingresampleratio.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio}_movingresampleratio.png")
+        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio},movingresampleratio.png")
         
         return twice_moving_fft_x, moving_ratio, sol
     

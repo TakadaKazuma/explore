@@ -66,7 +66,7 @@ def plot_focusFFT(sol, MUTC_h, timerange):
         plt.ylim(1e-8,1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_sol={sol},({MUTC_h}~_{timerange}s)', fontsize=15)
+        plt.title(f'PS_sol={sol}, MUTC={MUTC_h}~{timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)
@@ -74,12 +74,12 @@ def plot_focusFFT(sol, MUTC_h, timerange):
         plt.legend()
         
         #保存の設定
-        output_dir = f'focusFFT({MUTC_h}~_{timerange}s)'
+        output_dir = f'focusFFT,MUTC={MUTC_h}~{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"FFT_sol={sol},({MUTC_h}~_{timerange}s)_focusFFT.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={sol},MUTC={MUTC_h}~{timerange}s,focusFFT.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},({MUTC_h}~_{timerange}s)_focusFFT.png")
+        print(f"Save completed: sol={str(sol).zfill(4)},MUTC={MUTC_h}~{timerange}s,focusFFT.png")
         
         return fft_x, fft_y
     

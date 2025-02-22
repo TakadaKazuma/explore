@@ -143,7 +143,7 @@ def plot_movingratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
         plt.xscale('log')
         plt.plot(twice_moving_fft_x, moving_ratio, label='moving_ratio')        
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={timerange}(s)', fontsize=15)
+        plt.title(f'MPS_ID={ID}, sol={sol}, time_range={timerange}(s)', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel('Pressure Amplitude Ratio', fontsize=15)
         plt.grid(True)

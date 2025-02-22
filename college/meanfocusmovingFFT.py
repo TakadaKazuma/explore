@@ -90,7 +90,7 @@ def plot_focusmeanmovingFFT(MUTC_h, timerange, windowsize_FFT):
         plt.plot(fft_x, fft_y, label='FFT')    
         plt.plot(moving_fft_x, moving_fft_y, label='FFT_Movingmean')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_LTST_h={MUTC_h}~{timerange}s')
+        plt.title(f'MPS_MUTC={MUTC_h}~{timerange}s')
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
@@ -98,12 +98,12 @@ def plot_focusmeanmovingFFT(MUTC_h, timerange, windowsize_FFT):
         plt.tight_layout()
         
         # 保存の設定
-        output_dir = f'meanfocusmovingFFT_({MUTC_h}~{timerange}s)'
+        output_dir = f'meanfocusmovingFFT_MUTC={MUTC_h}~{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanfocusmovingFFT_windowsize_FFT={windowsize_FFT}.png"))
+        plt.savefig(os.path.join(output_dir, f"meanfocusmovingFFT,windowsize_FFT={windowsize_FFT}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanfocusmovingFFT_windowsize_FFT={windowsize_FFT}.png")
+        print(f"Save completed: meanfocusmovingFFT,windowsize_FFT={windowsize_FFT}.png")
         
         return moving_fft_x, moving_fft_y
 

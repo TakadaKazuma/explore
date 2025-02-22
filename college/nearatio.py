@@ -79,7 +79,7 @@ def plot_ratio(ID, timerange, interval, windowsize_FFT):
         plt.xscale('log')
         plt.plot(moving_fft_x, ratio, label='Ratio')
         plt.axvline(x=w, color='r', label='Border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, timerange={timerange}s', fontsize=15)
+        plt.title(f'PSR_ID={ID}, sol={sol}, timerange={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power Ratio', fontsize=15)
         plt.grid(True)
@@ -89,10 +89,10 @@ def plot_ratio(ID, timerange, interval, windowsize_FFT):
         #保存の設定
         output_dir = f'nearratio_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_ratio.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},ratio.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_ratio.png")
+        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},ratio.png")
         
         return moving_fft_x, ratio
     

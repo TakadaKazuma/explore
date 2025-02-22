@@ -122,7 +122,7 @@ def plot_movingFFT(ID, timerange, interval, windowsize_FFT):
         #plt.plot(fft_x, fft_y, label='FFT')
         plt.plot(moving_fft_x, moving_fft_y,label='FFT_Moving_mean')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'FFT_ID={ID}, sol={sol}, time_range={timerange}s')
+        plt.title(f'PS_ID={ID}, sol={sol}, time_range={timerange}s')
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
@@ -132,10 +132,10 @@ def plot_movingFFT(ID, timerange, interval, windowsize_FFT):
         #保存の設定
         output_dir = f'nearmovingFFT_{timerange}s_windowsize={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingFFT.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},movingFFT.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}_movingFFT.png")
+        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},movingFFT.png")
         
         return moving_fft_x, moving_fft_y
     

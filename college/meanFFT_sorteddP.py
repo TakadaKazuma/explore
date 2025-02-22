@@ -108,7 +108,7 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         plt.ylim(1e-6, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'dP <{dP_Ulimit}.timerange={timerange}s', fontsize=15)
+        plt.title(f'MPS_dP<{dP_Ulimit}.timerange={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)
@@ -118,10 +118,10 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         # 保存の設定
         output_dir = f'meanFFT_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanFFT_dP_~{dP_Ulimit}.png"))
+        plt.savefig(os.path.join(output_dir, f"meanFFT,dP_~{dP_Ulimit}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanFFT_dP_~{dP_Ulimit}.png")
+        print(f"Save completed: meanFFT,dP_~{dP_Ulimit}.png")
         
         return fft_x, fft_y
 

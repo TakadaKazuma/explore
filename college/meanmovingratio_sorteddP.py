@@ -110,7 +110,7 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
         plt.xscale('log')
         plt.plot(twice_moving_fft_x, moving_ratio, label='moving ratio')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'dP <{dP_Ulimit},time_range={timerange}s', fontsize=15)
+        plt.title(f'MMPS_dP <{dP_Ulimit},time_range={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel('Pressure Amplitude Ratio', fontsize=15)
         plt.grid(True)
@@ -120,10 +120,10 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
         # 保存の設定
         output_dir = f'meanmovingratio_dP_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanmovingratio_dP_~{dP_Ulimit}, windowsize_ratio={windowsize_ratio}.png"))
+        plt.savefig(os.path.join(output_dir, f"meanmovingratio,dP_~{dP_Ulimit},windowsize_ratio={windowsize_ratio}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanmovingratio_dP_~{dP_Ulimit}, windowsize_ratio={windowsize_ratio}.png")
+        print(f"Save completed: meanmovingratio,dP_~{dP_Ulimit},windowsize_ratio={windowsize_ratio}.png")
         
         return twice_moving_fft_x, moving_ratio
 

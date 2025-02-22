@@ -111,7 +111,7 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
         plt.ylim(1e-6, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'AT >{AT_Llimit},Ws<{Ws_Ulimit}(time_range={timerange}(s))')
+        plt.title(f'MPS_AT>{AT_Llimit},Ws<{Ws_Ulimit}, time_range={timerange}(s)')
         plt.xlabel('Vibration Frequency [Hz]',fontsize=15)
         plt.ylabel('Pressure Amplitude [Pa]', fontsize=15)
         plt.grid(True)
@@ -121,10 +121,10 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
         # 保存の設定
         output_dir = f'meanFFT_ATandWs_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanFFT_AT_{AT_Llimit}~,Ws_~{Ws_Ulimit}~.png"))
+        plt.savefig(os.path.join(output_dir, f"meanFFT,AT_{AT_Llimit}~,Ws_~{Ws_Ulimit}~.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanFFT_AT_{AT_Llimit}~,Ws_~{Ws_Ulimit}~.png")
+        print(f"Save completed: meanFFT,AT_{AT_Llimit}~,Ws_~{Ws_Ulimit}~.png")
         
         return fft_x, fft_y
 

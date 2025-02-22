@@ -128,7 +128,7 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
         plt.plot(fft_x, fft_y, label='FFT')    
         plt.plot(moving_fft_x, moving_fft_y, label='FFT_Movingmean')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'dP <{dP_Ulimit},time_range={timerange}s', fontsize=15)
+        plt.title(f'MPS_dP<{dP_Ulimit},time_range={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)
@@ -138,10 +138,10 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
         # 保存の設定
         output_dir = f'meanmovingFFT_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanmovingFFT_dP_~{dP_Ulimit}_windowsize={windowsize}.png"))
+        plt.savefig(os.path.join(output_dir, f"meanmovingFFT,dP_~{dP_Ulimit},windowsize={windowsize}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanmovingFFT_dP_~{dP_Ulimit}_windowsize={windowsize}.png")
+        print(f"Save completed: meanmovingFFT,dP_~{dP_Ulimit},windowsize={windowsize}.png")
         
         return moving_fft_x, moving_fft_y
 
