@@ -100,7 +100,7 @@ def plot_movingratio_resample(ID, timerange, interval, windowsize_FFT, windowsiz
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'neartwicemovingresampleratio_{timerange}s_windowsize_FFT={windowsize_FFT}'
+        output_dir = f'neartwicemovingratio_resample_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio},movingresampleratio.png"))
         plt.clf()

@@ -11,10 +11,10 @@ import nearmovingFFT
 import nearmovingratio
 import Dispersion_Relation
 
-def process_focusmovingratio_resample(sol, MUTC_h, timerange, windowsize_FFT, windowsize_ratio):
+def process_focusmovingratio(sol, MUTC_h, timerange, windowsize_FFT, windowsize_ratio):
     '''
     sol,MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを対象とし、
-    0.5秒間隔でのリサンプリングを行った後、気圧変化の線形回帰から導かれる残差に対して、
+    気圧変化の線形回帰から導かれる残差に対して、
     「パワースペクトルとその移動平均の比(パワースペクトル比)」が算出できる。
     更にパワースペクトル比に対して、
     再度移動平均をとった修正パワースペクトル及び対応するsolを返す関数
@@ -54,10 +54,10 @@ def process_focusmovingratio_resample(sol, MUTC_h, timerange, windowsize_FFT, wi
         print(f"An error occurred: {e}")
         return None
 
-def plot_focusmovingratio_resample(sol, MUTC_h, timerange, windowsize_FFT, windowsize_ratio):
+def plot_focusmovingratio(sol, MUTC_h, timerange, windowsize_FFT, windowsize_ratio):
     '''
     sol,MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを対象とし、
-    0.5秒間隔でのリサンプリングを行った後、気圧変化の線形回帰から導かれる残差に対して、
+    気圧変化の線形回帰から導かれる残差に対して、
     「パワースペクトルとその移動平均の比」を描画した画像を保存する関数。
     横軸:周波数(Hz) 縦軸:スペクトル強度の比
 
@@ -69,7 +69,7 @@ def plot_focusmovingratio_resample(sol, MUTC_h, timerange, windowsize_FFT, windo
     '''
     try:
         #パワースペクトルとその移動平均の導出
-        moving_fft_x, moving_ratio = process_focusmovingratio_resample(sol, MUTC_h, timerange, windowsize_FFT, windowsize_ratio)
+        moving_fft_x, moving_ratio = process_focusmovingratio(sol, MUTC_h, timerange, windowsize_FFT, windowsize_ratio)
         
         #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
@@ -87,12 +87,12 @@ def plot_focusmovingratio_resample(sol, MUTC_h, timerange, windowsize_FFT, windo
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'focusmovingratio_resample,MUTC={MUTC_h}~{timerange}s_windowsize_FFT={windowsize_FFT}'
+        output_dir = f'focusmovingratio,MUTC={MUTC_h}~{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={sol},({MUTC_h}~{timerange}s),focusmovingratio_resample.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={sol},({MUTC_h}~{timerange}s),focusmovingratio.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},({MUTC_h}~{timerange}s),focusmovingratio_resample.png")
+        print(f"Save completed: sol={str(sol).zfill(4)},({MUTC_h}~{timerange}s),focusmovingratio.png")
         
         return moving_fft_x, moving_ratio
     
@@ -113,4 +113,4 @@ if __name__ == "__main__":
     #ダストデビルのないsolを描画
     nodevilsollist = nodevil.process_nodevilsollist()
     for sol in tqdm(nodevilsollist, desc="Processing nodevil sols"):
-        plot_focusmovingratio_resample(sol, args.LTST_h, args.timerange, args.windowsize_FFT, args.windowsize_ratio) 
+        plot_focusmovingratio(sol, args.LTST_h, args.timerange, args.windowsize_FFT, args.windowsize_ratio) 

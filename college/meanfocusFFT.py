@@ -87,7 +87,7 @@ def plot_focusmeanFFT(MUTC_h, timerange):
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
-        plt.legend()
+        plt.legend(fontsize=15)
         plt.tight_layout()
         
         # 保存の設定

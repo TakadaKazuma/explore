@@ -70,8 +70,8 @@ def plot_focusFFT(sol, MUTC_h, timerange):
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)
+        plt.legend(fontsize=15)
         plt.tight_layout()
-        plt.legend()
         
         #保存の設定
         output_dir = f'focusFFT,MUTC={MUTC_h}~{timerange}s'
