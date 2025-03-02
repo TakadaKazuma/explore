@@ -11,7 +11,7 @@ def get_sol_MUTC(ID):
     ID(通し番号)に対応するsolとMUTCを取得する関数
     ID:通し番号(datacatalog上でdustdevilに割り振られたもの)
     '''
-    datacatalog = DATACATALOG.process_database()
+    datacatalog = DATACATALOG.process_datacatalog()
     sol = datacatalog.sol[ID]
     MUTC = datacatalog.MUTC[ID]
     return sol, MUTC
@@ -69,7 +69,7 @@ def process_neardevildata(ID, timerange, interval):
         if near_devildata is None:
             raise ValueError("")
         
-        near_devildata = nearFFT.caluculate_residual(near_devildata)
+        near_devildata = nearFFT.calculate_residual(near_devildata)
         '''
         「countdown」、「p-pred」、「residual」カラムの追加
         countdown:経過時間(秒) ※countdown ≦ 0
