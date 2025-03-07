@@ -75,9 +75,9 @@ def plot_focusmovingratio_resample(sol, MUTC_h, timerange, windowsize_FFT, windo
         #描画の設定
         plt.xscale('log')
         plt.ylim(1e-8, 1e2)
-        plt.plot(moving_fft_x, moving_ratio,label='ratio', fontsize=15)
+        plt.plot(moving_fft_x, moving_ratio,label='ratio')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'PSR_sol={sol}, MUTC={MUTC_h}~{timerange}s')
+        plt.title(f'PSR_sol={sol}, MUTC={MUTC_h}:00~{timerange}s')
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)
@@ -85,12 +85,12 @@ def plot_focusmovingratio_resample(sol, MUTC_h, timerange, windowsize_FFT, windo
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'focusmovingratio_resample,MUTC={MUTC_h}~{timerange}s_windowsize_FFT={windowsize_FFT}'
+        output_dir = f'focusmovingratioresample,MUTC={MUTC_h}:00~_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={sol},({MUTC_h}~{timerange}s),focusmovingratio_resample.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={sol}_{timerange}s_windowsize_ratio={windowsize_ratio}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},({MUTC_h}~{timerange}s),focusmovingratio_resample.png")
+        print(f"Save completed:sol={sol}_{timerange}s_windowsize_ratio={windowsize_ratio}.png")
         
         return moving_fft_x, moving_ratio
     

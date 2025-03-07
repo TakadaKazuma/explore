@@ -27,13 +27,15 @@ nearmovingratio_*s_windowsize
 
 nearmovingresampleratio_*s_windowsize*
 
-focuschange(*)_p
+focuschange_p,MUTC=*
 
-focusFFT(*)
+focusFFT,MUTC=*
 
-focusmovingFFT(*)_windowsize_*
+focusmovingFFT,MUTC=*_windowsize*
 
-focusmovingratio(*)_windowsize_*
+focusratio,MUTC=*_windowsize*
+
+focusmovingratio,MUTC=*_windowsize*
 
 #画像フォルダ(ケース平均)
 
