@@ -1,10 +1,7 @@
-import datetime
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import argparse as argparse
-import dailychange_p
 import focuschange_p
 import nodevil
 from tqdm import tqdm
@@ -74,29 +71,29 @@ def plot_focusmeanFFT(MUTC_h, timerange):
         fft_x = meanmovingFFT_sorteddP.process_arrays(fft_xlist, np.nanmean)
         fft_y = meanmovingFFT_sorteddP.process_arrays(fft_ylist, np.nanmean)
         
-        # 音波と重力波の境界に該当する周波数
+        #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
         
-        # プロットの設定
+        #プロットの設定
         plt.xscale('log')
         plt.yscale('log')
         plt.ylim(1e-6, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'MPS_MURC={MUTC_h}~{timerange}s')
+        plt.title(f'MPS_MUTC={MUTC_h}:00~{timerange}s')
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
         plt.legend(fontsize=15)
         plt.tight_layout()
         
-        # 保存の設定
-        output_dir = f'meanfocusFFT_MUTC={MUTC_h}~{timerange}s'
+        #保存の設定
+        output_dir = f'meanfocusFFT_MUTC={MUTC_h}:00~'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanfocusFFT_{timerange}s.png"))
+        plt.savefig(os.path.join(output_dir, f"{timerange}s.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanfocusFFT_{timerange}s.png")
+        print(f"Save completed:{timerange}s.png")
         
         return fft_x, fft_y
 

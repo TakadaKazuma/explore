@@ -1,7 +1,6 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
-from scipy import signal
 from tqdm import tqdm
 import os
 import argparse as argparse
@@ -89,19 +88,19 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
     windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     try:
-        #対応する全事象のパワースペクトルとその移動平均の比をリスト化したものの導出
+        #対応する全事象のパワースペクトルとその移動平均の比をリスト化したものを導出
         moving_fft_xlist, ratiolist = process_ratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT)
         if not moving_fft_xlist or not ratiolist:
             raise ValueError("No data")
         
-        # パワースペクトルと移動平均の比のケース平均を導出
+        #パワースペクトルと移動平均の比のケース平均を導出
         moving_fft_x = meanmovingFFT_sorteddP.process_arrays(moving_fft_xlist, np.nanmean)
         ratio = meanmovingFFT_sorteddP.process_arrays(ratiolist, np.mean)
         
-        # 音波と重力波の境界に該当する周波数
+        #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
         
-        # プロットの設定
+        #プロットの設定
         plt.xscale('log')
         plt.plot(moving_fft_x, ratio, label='ratio')
         plt.axvline(x=w, color='r', label='border')
@@ -112,7 +111,7 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
         plt.legend(fontsize=15)
         plt.tight_layout()
         
-        # 保存の設定
+        #保存の設定
         output_dir = f'meanratio_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"meanratio,dP_~{dP_Ulimit},windowsize_FFT={windowsize_FFT}.png"))

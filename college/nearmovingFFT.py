@@ -1,7 +1,6 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
-from scipy import signal
 import os
 import argparse as argparse
 import dailychange_p
@@ -9,14 +8,14 @@ import neardevil
 import Dispersion_Relation
 import nearFFT
 
-def moving_FFT(data, windowsize):
+def moving_FFT(data, windowsize_FFT):
     '''
     フィルタリング及び線形回帰済みの時系列データから
     気圧変化の残差に対してFFTを用いて、
     パワースペクトル及びパワースペクトルの移動平均を返す関数
 
     data:フィルタリング済みの時系列データ(dataframe)
-    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
+    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
 
     #パワースペクトルの導出
@@ -36,10 +35,10 @@ def moving_FFT(data, windowsize):
     #パワーの常用対数を算出
     log10_fft_y = np.log10(fft_y)
 
-    filter_frame = np.ones(windowsize) / windowsize
+    filter_frame = np.ones(windowsize_FFT) / windowsize_FFT
 
     #窓数に対応する、片側において移動平均をできない要素の数
-    pad_size = (windowsize - 1) // 2
+    pad_size = (windowsize_FFT - 1) // 2
     
     #fft_x及びfft_yの要素数に統一したndarray(要素は全てnan)を作成
     moving_fft_x = np.full(fft_x.shape, np.nan)

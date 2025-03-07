@@ -1,7 +1,6 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
-from scipy import signal
 import os
 import argparse as argparse
 import dailychange_p
@@ -10,14 +9,14 @@ import nearFFT
 import Dispersion_Relation
 import nearmovingFFT
 
-def calculate_movingave(x, y, windowsize):
+def calculate_movingave(x, y, windowsize_ratio):
     '''
     x及びyの移動平均を算出する関数
     ※用途は主にratioの移動平均を算出
 
     x:移動平均を算出したいndarray
     y:xと対をなす移動平均を算出したいndarray
-    windowsize:移動平均を計算する際の窓数(int型)
+    windowsize_ratio:移動平均を計算する際の窓数(int型)
     '''
 
     '''
@@ -29,8 +28,8 @@ def calculate_movingave(x, y, windowsize):
     正確な移動平均の値が計算できない要素にnanを代入し、
     形状を維持するようにしている。
     '''
-    filter_frame = np.ones(windowsize) / windowsize
-    pad_size = (windowsize - 1) // 2
+    filter_frame = np.ones(windowsize_ratio) / windowsize_ratio
+    pad_size = (windowsize_ratio - 1) // 2
     moving_x = np.full(x.shape, np.nan)
     moving_y = np.ones(y.shape, np.nan)
     

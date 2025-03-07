@@ -1,7 +1,6 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
-from scipy import signal
 from tqdm import tqdm
 import os
 import argparse as argparse
@@ -35,7 +34,7 @@ def process_arrays(arrays, operation):
 
     return result
 
-def process_movingFFTlist_dP(dP_Ulimit, timerange, interval, windowsize):
+def process_movingFFTlist_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
     '''
     dP_Ulimit > dP を満たすダストデビル全ての時系列データを加工し、
     全てのパワースペクトルの移動平均を列挙したリストを返す関数
@@ -44,7 +43,7 @@ def process_movingFFTlist_dP(dP_Ulimit, timerange, interval, windowsize):
     ※dP, dP_Ulimit < 0
     timerange:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    window_size:パワースペクトルの移動平均を計算する際の窓数(int型)
+    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     #記録用配列の作成
     fft_xlist, fft_ylist = [], []
@@ -80,7 +79,7 @@ def process_movingFFTlist_dP(dP_Ulimit, timerange, interval, windowsize):
                 raise ValueError("No data")
                 
             #パワースペクトルとその移動平均の導出
-            fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, windowsize)
+            fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, windowsize_FFT)
             
             #記録用配列に保存
             fft_xlist.append(fft_x)
@@ -94,7 +93,7 @@ def process_movingFFTlist_dP(dP_Ulimit, timerange, interval, windowsize):
             
     return fft_xlist, fft_ylist, moving_fft_xlist, moving_fft_ylist
 
-def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
+def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
     '''
     dP_Ulimit > dP を満たすダストデビル全ての時系列データを加工し、
     パワースペクトルの移動平均を平均し、それを描画及び保存する関数
@@ -108,20 +107,20 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
     '''
     try:
         #対応する全事象のパワースペクトルとその移動平均をリスト化したものの導出
-        fft_xlist, fft_ylist, moving_fft_xlist, moving_fft_ylist = process_movingFFTlist_dP(dP_Ulimit, timerange, interval, windowsize)
+        fft_xlist, fft_ylist, moving_fft_xlist, moving_fft_ylist = process_movingFFTlist_dP(dP_Ulimit, timerange, interval, windowsize_FFT)
         if not fft_xlist or not fft_ylist or not moving_fft_xlist or not moving_fft_ylist:
             raise ValueError("No data")
         
-        # パワースペクトルとその移動平均のケース平均の導出
+        #パワースペクトルとその移動平均のケース平均の導出
         fft_x = process_arrays(fft_xlist, np.nanmean)
         fft_y = process_arrays(fft_ylist, np.nanmean) 
         moving_fft_x = process_arrays(moving_fft_xlist, np.nanmean)
         moving_fft_y = process_arrays(moving_fft_ylist, np.nanmean)
         
-        # 音波と重力波の境界に該当する周波数
+        #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
         
-        # プロットの設定
+        #プロットの設定
         plt.xscale('log')
         plt.yscale('log')
         plt.ylim(1e-4,1e1)
@@ -135,13 +134,13 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize):
         plt.legend(fontsize=15)
         plt.tight_layout()
         
-        # 保存の設定
+        #保存の設定
         output_dir = f'meanmovingFFT_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanmovingFFT,dP_~{dP_Ulimit},windowsize={windowsize}.png"))
+        plt.savefig(os.path.join(output_dir, f"dP~{dP_Ulimit},windowsize={windowsize_FFT}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanmovingFFT,dP_~{dP_Ulimit},windowsize={windowsize}.png")
+        print(f"Save completed:dP~{dP_Ulimit},windowsize={windowsize_FFT}.png")
         
         return moving_fft_x, moving_fft_y
 

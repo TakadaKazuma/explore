@@ -1,5 +1,4 @@
 import datetime
-import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import argparse as argparse
@@ -43,7 +42,7 @@ def process_focusdata_p(sol, MUTC_h, timerange):
     #該当データを時刻MUTC_hからtimerange秒間でフィルタリング
     focus_data = filter_focusdata(focus_data, sol, MUTC_h, timerange)
 
-    focus_data = nearFFT.caluculate_residual(focus_data)
+    focus_data = nearFFT.calculate_residual(focus_data)
     '''
     「countdown」、「p-pred」、「residual」カラムの追加
     countdown:経過時間(秒) ※countdown ≦ 0
@@ -52,7 +51,7 @@ def process_focusdata_p(sol, MUTC_h, timerange):
     '''
     return focus_data
 
-def plot_focuschange_p(sol, LTST_h, timerange):
+def plot_focuschange_p(sol, MUTC_h, timerange):
     '''
     sol,時刻MUTC_hからtimerange秒間に対応する
     気圧の時系列データ及びその線形回帰の結果を描画した画像を保存する関数
@@ -63,7 +62,7 @@ def plot_focuschange_p(sol, LTST_h, timerange):
     '''
     try:
         #描画する時系列データの取得
-        focus_data = process_focusdata_p(sol, LTST_h, timerange)
+        focus_data = process_focusdata_p(sol, MUTC_h, timerange)
         if focus_data is None:
             raise ValueError(f"No data:sol={sol}")
          
@@ -73,18 +72,18 @@ def plot_focuschange_p(sol, LTST_h, timerange):
             label='true_value')
         plt.plot(focus_data["countdown"],focus_data["p-pred"],
             label='Linearize_value')
-        plt.title(f'sol={sol},({LTST_h}~_{timerange}s)', fontsize=15)
+        plt.title(f'sol={sol},MUTC={MUTC_h}:00~{timerange}s', fontsize=15)
         plt.xlabel('Local Time', fontsize=15)
         plt.ylabel('Pressure [Pa]', fontsize=15)
         plt.grid(True)
         
         #保存の設定
-        output_dir = f'focuschange({LTST_h}~_{timerange}s)_p'
+        output_dir = f'focuschange_p,MUTC={MUTC_h}:00~'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},({LTST_h}~_{timerange}s)_focuschange.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)}_{timerange}s.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},({LTST_h}~_{timerange}s)_focuschange.png")
+        print(f"Save completed: sol={str(sol).zfill(4)}_{timerange}s.png")
 
     except Exception as e:
         print(f"An error occurred: {e}")

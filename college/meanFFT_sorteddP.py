@@ -1,7 +1,6 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
-from scipy import signal
 from tqdm import tqdm
 import os
 import argparse as argparse
@@ -34,7 +33,7 @@ def process_FFTlist_dP(dP_Ulimit, timerange, interval):
     timerange:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
     '''
-     #記録用配列の作成
+    #記録用配列の作成
     fft_xlist, fft_ylist = [], []
 
     #dP_Ulimit > dP を満たすIDリストの作成
@@ -99,10 +98,10 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         fft_x = meanmovingFFT_sorteddP.process_arrays(fft_xlist, np.nanmean)
         fft_y = meanmovingFFT_sorteddP.process_arrays(fft_ylist, np.nanmean)
         
-        # 音波と重力波の境界に該当する周波数
+        #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
         
-        # プロットの設定
+        #プロットの設定
         plt.xscale('log')
         plt.yscale('log')
         plt.ylim(1e-6, 1e2)
@@ -115,7 +114,7 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         plt.legend(fontsize=15)
         plt.tight_layout()
         
-        # 保存の設定
+        #保存の設定
         output_dir = f'meanFFT_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"meanFFT,dP_~{dP_Ulimit}.png"))

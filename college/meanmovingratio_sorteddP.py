@@ -1,7 +1,6 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
-from scipy import signal
 from tqdm import tqdm
 import os
 import argparse as argparse
@@ -29,7 +28,7 @@ def process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, w
     windowsize_ratio:修正パワースペクトルを計算する際の窓数窓数(int型)
     '''
     #記録用配列の作成
-    twice_moving_fft_xlist, moving_ratiolist = [], []
+    moving_fft_xlist, moving_ratiolist = [], []
 
     #dP_Ulimit > dP を満たすIDリストの作成
     IDlist = meanFFT_sorteddP.process_IDlist_dP(dP_Ulimit)
@@ -66,10 +65,10 @@ def process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, w
             ratio = fft_y/moving_fft_y
             
             #比の移動平均を算出
-            twice_moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
+            moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
             
             #記録用配列に保存
-            twice_moving_fft_xlist.append(twice_moving_fft_x) 
+            moving_fft_xlist.append(moving_fft_x) 
             moving_ratiolist.append(moving_ratio)
             
             
@@ -77,7 +76,7 @@ def process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, w
             print(e)
             continue 
             
-    return twice_moving_fft_xlist, moving_ratiolist
+    return moving_fft_xlist, moving_ratiolist
 
 def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, windowsize_ratio):
     '''
@@ -95,20 +94,21 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
     '''
 
     try:
-        twice_moving_fft_xlist, moving_ratiolist = process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, windowsize_ratio)
-        if not twice_moving_fft_xlist or not moving_ratiolist:
+        #対応する全事象のパワースペクトルとその移動平均の比を（修正)リスト化したものを導出
+        moving_fft_xlist, moving_ratiolist = process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, windowsize_ratio)
+        if not moving_fft_xlist or not moving_ratiolist:
             raise ValueError("No data")
         
-        # 平均の導出
-        twice_moving_fft_x = meanmovingFFT_sorteddP.process_arrays(twice_moving_fft_xlist, np.nanmean)
+        #修正パワースペクトルのケース平均の導出
+        moving_fft_x = meanmovingFFT_sorteddP.process_arrays(moving_fft_xlist, np.nanmean)
         moving_ratio =  meanmovingFFT_sorteddP.process_arrays(moving_ratiolist, np.nanmean)
         
-        # 音波と重力波の境界に該当する周波数
+        #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
         
-        # プロットの設定
+        #プロットの設定
         plt.xscale('log')
-        plt.plot(twice_moving_fft_x, moving_ratio, label='moving ratio')
+        plt.plot(moving_fft_x, moving_ratio, label='moving ratio')
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'MMPS_dP <{dP_Ulimit},time_range={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
@@ -117,7 +117,7 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
         plt.legend(fontsize=15)
         plt.tight_layout()
         
-        # 保存の設定
+        #保存の設定
         output_dir = f'meanmovingratio_dP_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"meanmovingratio,dP_~{dP_Ulimit},windowsize_ratio={windowsize_ratio}.png"))
@@ -125,7 +125,7 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
         plt.close()
         print(f"Save completed: meanmovingratio,dP_~{dP_Ulimit},windowsize_ratio={windowsize_ratio}.png")
         
-        return twice_moving_fft_x, moving_ratio
+        return moving_fft_x, moving_ratio
 
     except ValueError as e:
         print(f"An error occurred: {e}")

@@ -1,6 +1,5 @@
 import datetime as datetime
 import matplotlib.pyplot as plt
-from scipy import signal
 import os
 import argparse as argparse
 import dailychange_p
@@ -65,8 +64,7 @@ def plot_ratio(ID, timerange, interval, windowsize_FFT):
     ID:ダストデビルに割り振られた通し番号(int型)
     timerange:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
-
+    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     try:
         #パワースペクトルとその移動平均の比を導出

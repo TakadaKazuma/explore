@@ -2,7 +2,6 @@ import numpy as np
 import datetime as datetime
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy import signal
 from tqdm import tqdm
 import os
 import argparse as argparse
@@ -41,7 +40,7 @@ def data_resample(data, s):
     new_data = data.copy()
 
     #「MUTC」カラムをdatetime型に変換
-    new_data["MUTC"]=pd.to_datetime(new_data["MUTC"],format="%Y-%m-%d %H:%M:%S.%f")
+    new_data["MUTC"] = pd.to_datetime(new_data["MUTC"],format="%Y-%m-%d %H:%M:%S.%f")
 
     #indexを先ほどの「MUTC」に変更し、これをもとにs秒でresample
     new_data = new_data.set_index("MUTC").resample(f"{s}S").mean()
@@ -168,10 +167,10 @@ def plot_meanFFT_season(ls, timerange, interval):
         # 保存の設定
         output_dir = f'meanFFT_sortedseason_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanFFT,ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png"))
+        plt.savefig(os.path.join(output_dir, f"ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanFFT,ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png")
+        print(f"Save completed:ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png")
         
         return fft_x, fft_y
 

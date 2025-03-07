@@ -1,4 +1,3 @@
-import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import argparse as argparse
@@ -66,7 +65,7 @@ def plot_focusFFT(sol, MUTC_h, timerange):
         plt.ylim(1e-8,1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'PS_sol={sol}, MUTC={MUTC_h}~{timerange}s', fontsize=15)
+        plt.title(f'PS_sol={sol}, MUTC={MUTC_h}:00~{timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)
@@ -74,12 +73,12 @@ def plot_focusFFT(sol, MUTC_h, timerange):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'focusFFT,MUTC={MUTC_h}~{timerange}s'
+        output_dir = f'focusFFT,MUTC={MUTC_h}:00~'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={sol},MUTC={MUTC_h}~{timerange}s,focusFFT.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)}_{timerange}s.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},MUTC={MUTC_h}~{timerange}s,focusFFT.png")
+        print(f"Save completed:sol={str(sol).zfill(4)}_{timerange}s.png")
         
         return fft_x, fft_y
     

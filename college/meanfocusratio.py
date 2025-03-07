@@ -76,14 +76,14 @@ def plot_focusmeanratio(MUTC_h, timerange, windowsize_FFT):
         if not moving_fft_xlist or not ratio_list:
             raise ValueError("No data")
         
-        # パワースペクトルとその移動平均のケース平均の導出
+        #パワースペクトルとその移動平均のケース平均の導出
         moving_fft_x =  meanmovingFFT_sorteddP.process_arrays(moving_fft_xlist, np.nanmean)
         ratio = meanmovingFFT_sorteddP.process_arrays(ratio_list, np.nanmean)
         
-        # 音波と重力波の境界に該当する周波数
+        #音波と重力波の境界に該当する周波数
         w = Dispersion_Relation.border_Hz()
         
-        # プロットの設定
+        #プロットの設定
         plt.xscale('log')
         plt.plot(moving_fft_x, ratio, label='ratio')
         plt.axvline(x=w, color='r', label='border')
@@ -94,7 +94,7 @@ def plot_focusmeanratio(MUTC_h, timerange, windowsize_FFT):
         plt.legend(fontsize=15)
         plt.tight_layout()
         
-        # 保存の設定
+        #保存の設定
         output_dir = f'meanfocusmovingratio_MUTC={MUTC_h}~{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"meanfocusmovingratio,windowsize_FFT={windowsize_FFT}.png"))

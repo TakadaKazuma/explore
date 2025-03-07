@@ -1,4 +1,3 @@
-import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import argparse as argparse
@@ -67,7 +66,7 @@ def plot_focusmovingFFT(sol, MUTC_h, timerange, windowsize_FFT):
         plt.yscale('log')
         plt.ylim(1e-8, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
-        plt.plot(moving_fft_x, moving_fft_y,label='FFT_Moving_mean', fontsize=15)
+        plt.plot(moving_fft_x, moving_fft_y,label='FFT_Moving_mean')
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'PS_sol={sol}, MUTC={MUTC_h}~{timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
@@ -77,12 +76,12 @@ def plot_focusmovingFFT(sol, MUTC_h, timerange, windowsize_FFT):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'focusmovingFFT,MUTC={MUTC_h}~{timerange}s_windowsize_FFT={windowsize_FFT}'
+        output_dir = f'focusmovingFFT,MUTC={MUTC_h}:00~_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={sol},({MUTC_h}~_{timerange}s),focusmovingFFT.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={sol}_{timerange}s.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},({MUTC_h}~_{timerange}s),focusmovingFFT.png")
+        print(f"Save completed:sol={sol}_{timerange}s.png.png")
         
         return fft_x, fft_y, moving_fft_x, moving_fft_y
     

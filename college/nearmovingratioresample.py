@@ -1,7 +1,5 @@
 import datetime as datetime
-import pandas as pd
 import matplotlib.pyplot as plt
-from scipy import signal
 import os
 import argparse as argparse
 import dailychange_p
