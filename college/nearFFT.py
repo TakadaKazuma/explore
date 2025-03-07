@@ -6,7 +6,7 @@ import os
 import argparse as argparse
 import dailychange_p
 import neardevil
-import Dispersion_Relation
+from Dispersion_Relation import Params
 
 def calculate_residual(data):
     '''
@@ -106,7 +106,8 @@ def plot_nearFFT(ID, timerange, interval):
         fft_x, fft_y, sol = process_nearFFT(ID, timerange, interval)
         
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #描画の設定
         plt.xscale('log')
@@ -124,10 +125,10 @@ def plot_nearFFT(ID, timerange, interval):
         #保存の設定
         output_dir = f'nearFFT_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},nearFFT.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},nearFFT.png")
+        print(f"Save completed:sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}.png")
         
         return fft_x, fft_y
 
