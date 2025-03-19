@@ -117,10 +117,10 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         #保存の設定
         output_dir = f'meanFFT_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanFFT,dP_~{dP_Ulimit}.png"))
+        plt.savefig(os.path.join(output_dir, f"dP is More{dP_Ulimit}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanFFT,dP_~{dP_Ulimit}.png")
+        print(f"Save completed:dP is More{dP_Ulimit}.png")
         
         return fft_x, fft_y
 

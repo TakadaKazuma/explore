@@ -1,16 +1,17 @@
 import datetime as datetime
 import matplotlib.pyplot as plt
+from scipy import signal
 import os
 import argparse as argparse
 import dailychange_p
 import neardevil
 import nearFFT
-import meanFFT_sortedseason
-import Dispersion_Relation
 import nearmovingFFT
-import nearmovingratio
+import nearratio
+import meanFFT_sortedseason
+from Dispersion_Relation import Params
 
-def process_movingresampleratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
+def process_movingratio_resample(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
     '''
     IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを対象とし、
     0.5秒間隔でのリサンプリングを行った後、気圧変化の線形回帰から導かれる残差に対して、
@@ -50,15 +51,18 @@ def process_movingresampleratio(ID, timerange, interval, windowsize_FFT, windows
         '''
         
         #パワースペクトルとその移動平均の導出
-        _, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, windowsize_FFT)
-
+        fft_x, fft_y, _, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, windowsize_FFT)
+        
         #比の算出
-        ratio = fft_y/moving_fft_y
+        moving_fft_x, ratio = nearratio.calculate_ratio(fft_x, fft_y, moving_fft_y, windowsize_FFT)
 
         #比の移動平均を算出
-        twice_moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
+        moving_fft_x, moving_ratio = calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
+        
+        #特定の周波数より高周波の情報をnanに変更
+        #moving_fft_x, ratio = nearratio.filter_xUlimit(moving_fft_x, ratio, 0.8)
 
-        return twice_moving_fft_x, moving_ratio, sol
+        return moving_fft_x, moving_ratio, sol
     
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -81,14 +85,15 @@ def plot_movingratio_resample(ID, timerange, interval, windowsize_FFT, windowsiz
     '''
     try:
         #パワースペクトルとその移動平均の比を導出し、更にその移動平均を算出する
-        twice_moving_fft_x, moving_ratio, sol = process_movingresampleratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio)
+        moving_fft_x, moving_ratio, sol = process_movingratio_resample(ID, timerange, interval, windowsize_FFT, windowsize_ratio)
 
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #描画の設定
         plt.xscale('log')
-        plt.plot(twice_moving_fft_x, moving_ratio, label='moving_ratio')        
+        plt.plot(moving_fft_x, moving_ratio, label='moving_ratio')        
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'MPS_ID={ID}, sol={sol}, time_range={timerange}(s)', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
@@ -98,14 +103,14 @@ def plot_movingratio_resample(ID, timerange, interval, windowsize_FFT, windowsiz
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'neartwicemovingratio_resample_{timerange}s_windowsize_FFT={windowsize_FFT}'
+        output_dir = f'nearmovingratioresample_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio},movingresampleratio.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio},movingresampleratio.png")
+        print(f"Save completed:sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio}.png")
         
-        return twice_moving_fft_x, moving_ratio, sol
+        return moving_fft_x, moving_ratio, sol
     
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -122,4 +127,3 @@ if __name__ == "__main__":
                          help="The [windowsize] used to calculate the moving average of ratio") #パワースペクトルとその移動平均の比の移動平均を計算する際の窓数の指定
     args = parser.parse_args()
     plot_movingratio_resample(args.ID, args.timerange, 20, args.windowsize_FFT, args.windowsize_ratio)
-
