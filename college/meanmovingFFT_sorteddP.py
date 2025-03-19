@@ -1,16 +1,17 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
+from scipy import signal
 from tqdm import tqdm
 import os
 import argparse as argparse
 import dailychange_p
 import neardevil
 import nearFFT
+import nearmovingFFT
 import meanFFT_sortedseason
 import meanFFT_sorteddP
-import Dispersion_Relation
-import nearmovingFFT
+from Dispersion_Relation import Params
 
 def process_arrays(arrays, operation):
     '''
@@ -103,7 +104,7 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
     ※dP, dP_max < 0
     time_range:時間間隔(切り出す時間)(秒)(int型)
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
+    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
     try:
         #対応する全事象のパワースペクトルとその移動平均をリスト化したものの導出
@@ -118,7 +119,8 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
         moving_fft_y = process_arrays(moving_fft_ylist, np.nanmean)
         
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #プロットの設定
         plt.xscale('log')
@@ -137,10 +139,10 @@ def plot_meanmovingFFT_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
         #保存の設定
         output_dir = f'meanmovingFFT_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"dP~{dP_Ulimit},windowsize={windowsize_FFT}.png"))
+        plt.savefig(os.path.join(output_dir, f"dP is More{dP_Ulimit},windowsize={windowsize_FFT}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed:dP~{dP_Ulimit},windowsize={windowsize_FFT}.png")
+        print(f"Save completed:dP is More{dP_Ulimit},windowsize={windowsize_FFT}.png")
         
         return moving_fft_x, moving_fft_y
 
@@ -151,7 +153,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot the average moving power spectrum for each dP_Ulimit")
     parser.add_argument('dP_Ulimit', type=int, help="Maximum value of dP(Pa)(Negative)") #dPの上限の指定(負)
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
-    parser.add_argument('windowsize', type=int, 
+    parser.add_argument('windowsize_FFT', type=int, 
                         help="The [windowsize] used to calculate the moving average") #パワースペクトルの移動平均を計算する際の窓数の指定
     args = parser.parse_args()
-    plot_meanmovingFFT_dP(args.dP_Ulimit, args.timerange, 20, args.windowsize)
+    plot_meanmovingFFT_dP(args.dP_Ulimit, args.timerange, 20, args.windowsize_FFT)

@@ -1,93 +1,48 @@
 import numpy as np
-import datetime as datetime
 import matplotlib.pyplot as plt
 import os
 import argparse as argparse
-import dailychange_p
-import neardevil
+import focuschange_p
+import nodevil
+from tqdm import tqdm
 import nearFFT
-import Dispersion_Relation
 import nearmovingFFT
+import nearratio
+import nearmovingratio
+import meanFFT_sortedseason
+import meanmovingFFT_sorteddP
+from Dispersion_Relation import Params
 
-def calculate_movingave(x, y, windowsize_ratio):
+def process_focusmovingratiolist(MUTC_h, timerange, windowsize_FFT, windowsize_ratio):
     '''
-    x及びyの移動平均を算出する関数
-    ※用途は主にratioの移動平均を算出
-
-    x:移動平均を算出したいndarray
-    y:xと対をなす移動平均を算出したいndarray
-    windowsize_ratio:移動平均を計算する際の窓数(int型)
-    '''
-
-    '''
-    以下では形状を維持しつつ、x及びyの移動平均を導出
-    ※主にx,yはパワースペクトルをその移動平均で割ったものが対象となる。
-    パワースペクトルの各要素及び長さは、それ自体に意味があるため、
-    パワースペクトルから算出される計算の対象も同様である。
-    移動平均を算出した際にその情報が壊れないようにするため、
-    正確な移動平均の値が計算できない要素にnanを代入し、
-    形状を維持するようにしている。
-    '''
-    filter_frame = np.ones(windowsize_ratio) / windowsize_ratio
-    pad_size = (windowsize_ratio - 1) // 2
-    moving_x = np.full(x.shape, np.nan)
-    moving_y = np.ones(y.shape, np.nan)
-    
-    moving_x[pad_size:-pad_size] = x[pad_size:-pad_size]
-    moving_y[pad_size:-pad_size] = np.convolve(y, filter_frame, mode='valid')
-    
-    return moving_x, moving_y
-
-
-def filter_xUlimit(x, y, xUlimit):
-    '''
-    指定された上限以上の値をとるxの要素に全てnanに変更し、
-    そのxの要素に対応したyの要素もnanに変更する関数。
-
-    x:フィルタリングを行いたいndarray
-    y:ndarray
-    x_Ulimit:xの基準となる上限(int型)
-    '''
-    # 配列の型をNan取り扱うことが可能なものに変換
-    x = x.astype(float)
-    y = y.astype(float)
-
-    # 条件を満たす要素を
-    x[x >= xUlimit] = np.nan
-    y[x >= xUlimit] = np.nan
-
-    return x, y
-
-
-def process_movingratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
-    '''
-    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを対象とし、
-    気圧変化の線形回帰から導かれる残差に対して、
+    ダストデビルが1つも発生していない火星日のうち、
+    MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを全て加工し、
     「パワースペクトルとその移動平均の比(パワースペクトル比)」が算出できる。
     更にパワースペクトル比に対して、
-    再度移動平均をとった修正パワースペクトル及びそれに対応するsolを返す関数
+    再度移動平均をとった修正パワースペクトルを列挙したリストを返す関数
 
-    ID:ダストデビルに割り振られた通し番号(int型)
-    time_range:時間間隔(切り出す時間)(秒)(int型)
-    interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    windowsize_FFT:パワースペクトル比を計算する際の窓数(int型)
-    windowsize_ratio:修正パワースペクトルを計算するときの窓数(int型)
+    MUTC_h:基準となる開始時刻(int型)(0 ≦ MUTC_h ≦ 23)
+    timerange:時間間隔(切り出す時間)(秒)(int型)
+    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
+    windowsize_ratio:パワースペクトルとその移動平均の比の移動平均を計算するときの窓数(int型)
     '''
-    try:
-        #IDに対応するsol及びMUTCを取得
-        sol, MUTC = neardevil.get_sol_MUTC(ID)
 
-        #該当sol付近の時系列データを取得
-        data = dailychange_p.process_surround_dailydata(sol)
-        if data is None:
-            raise ValueError("")
-        
-        #該当範囲の抽出
-        near_devildata = neardevil.filter_neardevildata(data, MUTC, timerange, interval)
-        if near_devildata is None:
-            raise ValueError("")
-        
-        near_devildata = nearFFT.calculate_residual(near_devildata)
+    #記録用配列の作成 
+    moving_fft_xlist, moving_ratiolist = [], []
+
+    #ダストデビルの発生がないsolのリストを作成
+    nodevilsollist = nodevil.process_nodevilsollist()
+
+    for sol in tqdm(nodevilsollist, desc="Processing nodevil sol"):
+        #該当する時系列データの取得
+        focus_data = focuschange_p.process_focusdata_p(sol, MUTC_h, timerange)
+        if focus_data is None or focus_data.empty:
+            continue
+
+        #加工済みデータを0.5秒でresample      
+        focus_data = meanFFT_sortedseason.data_resample(focus_data, 0.5)
+
+        focus_data = nearFFT.calculate_residual(focus_data)
         '''
         「countdown」、「p-pred」、「residual」カラムの追加
         countdown:経過時間(秒) ※countdown ≦ 0
@@ -95,82 +50,89 @@ def process_movingratio(ID, timerange, interval, windowsize_FFT, windowsize_rati
         residual:残差
         '''
         
+        #パワースペクトルの導出
+        fft_x, fft_y = nearFFT.FFT(focus_data)
+            
         #パワースペクトルとその移動平均の導出
-        fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, windowsize_FFT)
-
-    
-        #特定の周波数より高周波の情報をnanに変更
-        fft_x, fft_y = filter_xUlimit(fft_x, fft_y, 4.5)
-        moving_fft_x, moving_fft_y = filter_xUlimit(moving_fft_x, moving_fft_y, 4.5)
-    
+        fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(focus_data, windowsize_FFT)
 
         #比の算出
-        ratio = fft_y/moving_fft_y
-
+        moving_fft_x, ratio = nearratio.calculate_ratio(fft_x, fft_y, moving_fft_y, windowsize_FFT)
+        
         #比の移動平均を算出
-        twice_moving_fft_x, moving_ratio = calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
+        moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
+            
+        #記録用配列に保存
+        moving_fft_xlist.append(moving_fft_x) 
+        moving_ratiolist.append(moving_ratio)
+        
+        count += 1 
+            
+        if count >= 15:
+            break
+            
+    return moving_fft_xlist, moving_ratiolist
 
-        return twice_moving_fft_x, moving_ratio, sol
-    
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
-
-def plot_movingratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio):
+def plot_focusmeanmovingratio(MUTC_h, timerange, windowsize_FFT, windowsize_ratio):
     '''
-    IDに対応する「dustdevilの発生直前 ~ 発生寸前」における気圧の時系列データを対象とし、
-    気圧変化の線形回帰から導かれる残差に対して、
-    「パワースペクトルとその移動平均の比(パワースペクトル比)」が算出できる。
-    更にパワースペクトル比に対して、
-    再度移動平均をとった修正パワースペクトルを描画した画像を保存する関数。
+    ダストデビルが1つも発生していない火星日のうち、
+    MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを全て加工し、
+    パワースペクトルとその移動平均の比を平均を描画した画像を保存する関数。
     横軸:周波数(Hz) 縦軸:スペクトル強度の比
 
-    ID:ダストデビルに割り振られた通し番号
+    MUTC_h:基準となる開始時刻(int型)(0 ≦ MUTC_h ≦ 23)
     timerange:時間間隔(切り出す時間)(秒)(int型)
-    interval:ラグ(何秒前から切り出すか)(秒)(int型)
-    windowsize_FFT:パワースペクトル比を計算する際の窓数(int型)
-    windowsize_ratio:修正パワースペクトルを計算するときの窓数(int型)
+    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
+    windowsize_ratio:パワースペクトルとその移動平均の比の移動平均を計算するときの窓数(int型)
     '''
     try:
-        #パワースペクトルとその移動平均の比を導出し、更にその移動平均を算出する
-        twice_moving_fft_x, moving_ratio, sol = process_movingratio(ID, timerange, interval, windowsize_FFT, windowsize_ratio)
-
-        #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        #対応する全事象のパワースペクトルとその移動平均の比をリスト化したもの(修正パワースペクトル)を導出
+        moving_fft_xlist, moving_ratiolist = process_focusmovingratiolist(MUTC_h, timerange, windowsize_FFT, windowsize_ratio)
+        if not moving_fft_xlist or not moving_ratiolist:
+            raise ValueError("No data")
         
-        #描画の設定
+        #修正パワースペクトルのケース平均の導出
+        moving_fft_x =  meanmovingFFT_sorteddP.process_arrays(moving_fft_xlist, np.nanmean)
+        moving_ratio = meanmovingFFT_sorteddP.process_arrays(moving_ratiolist, np.nanmean)
+        
+        #特定の周波数より高周波の情報をnanに変更
+        #moving_fft_x, moving_ratio = nearratio.filter_xUlimit(moving_fft_x, moving_ratio, 0.8)
+        
+        #音波と重力波の境界に該当する周波数
+        params = Params()
+        w = params.border_Hz()
+        
+        #プロットの設定
         plt.xscale('log')
-        plt.plot(twice_moving_fft_x, moving_ratio, label='moving_ratio')        
+        plt.plot(moving_fft_x, moving_ratio, label='moving ratio')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'MPS_ID={ID}, sol={sol}, time_range={timerange}(s)', fontsize=15)
-        plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
-        plt.ylabel('Pressure Amplitude Ratio', fontsize=15)
+        plt.title(f'MMPS_MUTC={MUTC_h}:00~{timerange}s')
+        plt.xlabel('Vibration Frequency [Hz]')
+        plt.ylabel(f'Pressure Amplitude Ratio')
         plt.grid(True)
         plt.legend(fontsize=15)
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'nearmovingratio_{timerange}s_windowsize_FFT={windowsize_FFT}'
+        output_dir = f'meanfocustwicemovingratio,MUTC={MUTC_h}:00~{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio},movingratio.png"))
+        plt.savefig(os.path.join(output_dir, f"{timerange}s_windowsize_ratio={windowsize_ratio}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},windowsize_ratio={windowsize_ratio},movingratio.png")
+        print(f"Save completed:{timerange}s_windowsize_ratio={windowsize_ratio}.png")
         
-        return twice_moving_fft_x, moving_ratio, sol
-    
-    except Exception as e:
+        return moving_fft_x, moving_ratio
+
+    except ValueError as e:
         print(f"An error occurred: {e}")
-        return None
-    
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the moving average of the ratio of the power spectrum to its moving average for the resampled data corresponding to the given ID.")
-    parser.add_argument('ID', type=int, help="ID") #IDの指定
-    parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
+    parser = argparse.ArgumentParser(description="Plot the average moving power spectrum for each LTST_h")
+    parser.add_argument('MUTC_h', type=int, help='Base start time') #基準となる開始の時間
+    parser.add_argument('timerange', type=int, help='timerange(s)') #時間間隔(切り出す時間)の指定(秒)
     parser.add_argument('windowsize_FFT', type=int, 
-                        help="The [windowsize] used to calculate the moving average of FFT") #パワースペクトルの移動平均を計算する際の窓数の指定
+                        help="The [windowsize] used to calculate the moving average") #パワースペクトルの移動平均を計算する際の窓数の指定
     parser.add_argument('windowsize_ratio', type=int, 
                         help="The [windowsize] used to calculate the moving average of ratio") #パワースペクトルとその移動平均の比の移動平均を計算する際の窓数の指定
     args = parser.parse_args()
-    plot_movingratio(args.ID, args.timerange, 20, args.windowsize_FFT, args.windowsize_ratio)
+    plot_focusmeanmovingratio(args.MUTC_h, args.timerange, args.windowsize_FFT, args.windowsize_ratio)

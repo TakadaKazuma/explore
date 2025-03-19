@@ -2,15 +2,16 @@ import numpy as np
 import datetime as datetime
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy import signal
 from tqdm import tqdm
 import os
 import argparse as argparse
 import DATACATALOG
 import dailychange_p
 import neardevil
-import Dispersion_Relation
 import nearFFT
 import meanmovingFFT_sorteddP
+from Dispersion_Relation import Params
 
 def process_IDlist_ls(ls):
     '''
@@ -40,7 +41,7 @@ def data_resample(data, s):
     new_data = data.copy()
 
     #「MUTC」カラムをdatetime型に変換
-    new_data["MUTC"] = pd.to_datetime(new_data["MUTC"],format="%Y-%m-%d %H:%M:%S.%f")
+    new_data["MUTC"]=pd.to_datetime(new_data["MUTC"],format="%Y-%m-%d %H:%M:%S.%f")
 
     #indexを先ほどの「MUTC」に変更し、これをもとにs秒でresample
     new_data = new_data.set_index("MUTC").resample(f"{s}S").mean()
@@ -148,8 +149,9 @@ def plot_meanFFT_season(ls, timerange, interval):
         fft_x = meanmovingFFT_sorteddP.process_arrays(fft_xlist, np.nanmean)
         fft_y = meanmovingFFT_sorteddP.process_arrays(fft_ylist, np.nanmean)
         
-        # 音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        #音波と重力波の境界に該当する周波数
+        params = Params()
+        w = params.border_Hz()
         
         # プロットの設定
         plt.xscale('log')
@@ -167,10 +169,10 @@ def plot_meanFFT_season(ls, timerange, interval):
         # 保存の設定
         output_dir = f'meanFFT_sortedseason_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png"))
+        plt.savefig(os.path.join(output_dir, f"ls is More{str(LS).zfill(3)} and less{str(LS+30).zfill(3)}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed:ls_{str(LS).zfill(3)}~{str(LS+30).zfill(3)}.png")
+        print(f"Save completed:ls is More{str(LS).zfill(3)} and less{str(LS+30).zfill(3)}.png")
         
         return fft_x, fft_y
 

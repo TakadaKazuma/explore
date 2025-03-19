@@ -1,12 +1,13 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
+from scipy import signal
 import os
 import argparse as argparse
 import dailychange_p
 import neardevil
-import Dispersion_Relation
 import nearFFT
+from Dispersion_Relation import Params
 
 def moving_FFT(data, windowsize_FFT):
     '''
@@ -15,7 +16,7 @@ def moving_FFT(data, windowsize_FFT):
     パワースペクトル及びパワースペクトルの移動平均を返す関数
 
     data:フィルタリング済みの時系列データ(dataframe)
-    windowsize_FFT:パワースペクトルの移動平均を計算する際の窓数(int型)
+    windowsize:パワースペクトルの移動平均を計算する際の窓数(int型)
     '''
 
     #パワースペクトルの導出
@@ -113,12 +114,15 @@ def plot_movingFFT(ID, timerange, interval, windowsize_FFT):
         fft_x, fft_y, moving_fft_x, moving_fft_y, sol = process_movingFFT(ID, timerange, interval, windowsize_FFT)
         
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #描画の設定
         plt.xscale('log')
         plt.yscale('log')
-        #plt.plot(fft_x, fft_y, label='FFT')
+        plt.ylim(1e-9, 1e2)
+        plt.plot(fft_x, fft_y, label='FFT')
+        #plt.ylim(1e-6, 1e2)
         plt.plot(moving_fft_x, moving_fft_y,label='FFT_Moving_mean')
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'PS_ID={ID}, sol={sol}, time_range={timerange}s')
@@ -131,10 +135,10 @@ def plot_movingFFT(ID, timerange, interval, windowsize_FFT):
         #保存の設定
         output_dir = f'nearmovingFFT_{timerange}s_windowsize={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},movingFFT.png"))
+        plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)},ID={str(ID).zfill(5)},movingFFT.png")
+        print(f"Save completed:sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}.png")
         
         return moving_fft_x, moving_fft_y
     

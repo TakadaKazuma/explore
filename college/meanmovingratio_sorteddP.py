@@ -1,18 +1,20 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
+from scipy import signal
 from tqdm import tqdm
 import os
 import argparse as argparse
 import dailychange_p
 import neardevil
 import nearFFT
-import Dispersion_Relation
 import nearmovingFFT
+import nearratio
 import nearmovingratio
 import meanFFT_sortedseason
 import meanFFT_sorteddP
 import meanmovingFFT_sorteddP
+from Dispersion_Relation import Params
 
 def process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, windowsize_ratio):
     '''
@@ -59,10 +61,11 @@ def process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, w
             '''
 
             #パワースペクトルとその移動平均の導出
-            _, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, windowsize_FFT)
+            fft_x, fft_y, _, moving_fft_y = nearmovingFFT.moving_FFT(near_devildata, windowsize_FFT)
+            
             
             #比の算出
-            ratio = fft_y/moving_fft_y
+            moving_fft_x, ratio = nearratio.calculate_ratio(fft_x, fft_y, moving_fft_y, windowsize_FFT)
             
             #比の移動平均を算出
             moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
@@ -103,14 +106,18 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
         moving_fft_x = meanmovingFFT_sorteddP.process_arrays(moving_fft_xlist, np.nanmean)
         moving_ratio =  meanmovingFFT_sorteddP.process_arrays(moving_ratiolist, np.nanmean)
         
+        #特定の周波数より高周波の情報をnanに変更
+        #moving_fft_x, moving_ratio = nearratio.filter_xUlimit(moving_fft_x, moving_ratio, 0.8)
+        
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #プロットの設定
         plt.xscale('log')
         plt.plot(moving_fft_x, moving_ratio, label='moving ratio')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'MMPS_dP <{dP_Ulimit},time_range={timerange}s', fontsize=15)
+        plt.title(f'MMPS_dP >{-dP_Ulimit},time_range={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel('Pressure Amplitude Ratio', fontsize=15)
         plt.grid(True)
@@ -120,10 +127,10 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
         #保存の設定
         output_dir = f'meanmovingratio_dP_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanmovingratio,dP_~{dP_Ulimit},windowsize_ratio={windowsize_ratio}.png"))
+        plt.savefig(os.path.join(output_dir, f"dP is More{-dP_Ulimit},windowsize_ratio={windowsize_ratio}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanmovingratio,dP_~{dP_Ulimit},windowsize_ratio={windowsize_ratio}.png")
+        print(f"Save completed:dP is More{-dP_Ulimit},windowsize_ratio={windowsize_ratio}.png")
         
         return moving_fft_x, moving_ratio
 
