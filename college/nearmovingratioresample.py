@@ -8,6 +8,7 @@ import neardevil
 import nearFFT
 import nearmovingFFT
 import nearratio
+import nearmovingratio
 import meanFFT_sortedseason
 from Dispersion_Relation import Params
 
@@ -57,7 +58,7 @@ def process_movingratio_resample(ID, timerange, interval, windowsize_FFT, window
         moving_fft_x, ratio = nearratio.calculate_ratio(fft_x, fft_y, moving_fft_y, windowsize_FFT)
 
         #比の移動平均を算出
-        moving_fft_x, moving_ratio = calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
+        moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
         
         #特定の周波数より高周波の情報をnanに変更
         #moving_fft_x, ratio = nearratio.filter_xUlimit(moving_fft_x, ratio, 0.8)

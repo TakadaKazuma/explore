@@ -1,16 +1,17 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
+from scipy import signal
 from tqdm import tqdm
 import os
 import argparse as argparse
 import DATACATALOG
 import dailychange_p
 import neardevil
-import Dispersion_Relation
 import nearFFT
 import meanFFT_sortedseason
 import meanmovingFFT_sorteddP
+from Dispersion_Relation import Params
 
 def process_IDlist_dP(dP_Ulimit):
     '''
@@ -99,7 +100,8 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         fft_y = meanmovingFFT_sorteddP.process_arrays(fft_ylist, np.nanmean)
         
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #プロットの設定
         plt.xscale('log')
@@ -107,7 +109,7 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         plt.ylim(1e-6, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'MPS_dP<{dP_Ulimit}.timerange={timerange}s', fontsize=15)
+        plt.title(f'MPS_dP>{-dP_Ulimit}.timerange={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)

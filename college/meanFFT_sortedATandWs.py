@@ -1,16 +1,17 @@
 import numpy as np
 import datetime as datetime
 import matplotlib.pyplot as plt
+from scipy import signal
 from tqdm import tqdm
 import os
 import argparse as argparse
 import DATACATALOG
 import dailychange_p
 import neardevil
-import Dispersion_Relation
 import nearFFT
 import meanFFT_sortedseason
 import meanmovingFFT_sorteddP
+from Dispersion_Relation import Params
 
 def process_IDlist_ATandWs(AT_Llimit, Ws_Ulimit):
     '''
@@ -102,7 +103,8 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
         fft_y = meanmovingFFT_sorteddP.process_arrays(fft_ylist, np.nanmean)
         
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #プロットの設定
         plt.xscale('log')
@@ -118,12 +120,12 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanFFT_ATandWs_{timerange}s'
+        output_dir = f'meanFFT_sortedATandWs_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanFFT,AT_{AT_Llimit}~,Ws_~{Ws_Ulimit}~.png"))
+        plt.savefig(os.path.join(output_dir, f"AT is More{AT_Llimit},Ws is less{Ws_Ulimit}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanFFT,AT_{AT_Llimit}~,Ws_~{Ws_Ulimit}~.png")
+        print(f"Save completed: AT is More{AT_Llimit},Ws is less{Ws_Ulimit}.png")
         
         return fft_x, fft_y
 
