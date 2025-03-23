@@ -10,17 +10,16 @@ import neardevil
 import nearFFT
 import nearmovingFFT
 import nearratio
-import nearmovingratio
 import meanFFT_sortedseason
 import meanFFT_sorteddP
 import meanmovingFFT_sorteddP
 from Dispersion_Relation import Params
 
-def process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, windowsize_ratio):
+def process_ratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
     '''
     dP_Ulimit > dP を満たす全て事象の時系列データを加工し、
-    全ての「パワースペクトルとその移動平均の比(パワースペクトル比)」に対して
-    再度移動平均を取った結果(修正パワースペクトル)を列挙したリストを返す関数
+    全ての「パワースペクトルとその移動平均の比(パワースペクトル比)」
+    を列挙したリストを返す関数
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_max < 0
@@ -30,7 +29,7 @@ def process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, w
     windowsize_ratio:修正パワースペクトルを計算する際の窓数窓数(int型)
     '''
     #記録用配列の作成
-    moving_fft_xlist, moving_ratiolist = [], []
+    moving_fft_xlist, ratiolist = [], []
 
     #dP_Ulimit > dP を満たすIDリストの作成
     IDlist = meanFFT_sorteddP.process_IDlist_dP(dP_Ulimit)
@@ -67,25 +66,22 @@ def process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, w
             #比の算出
             moving_fft_x, ratio = nearratio.calculate_ratio(fft_x, fft_y, moving_fft_y, windowsize_FFT)
             
-            #比の移動平均を算出
-            moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
             
             #記録用配列に保存
             moving_fft_xlist.append(moving_fft_x) 
-            moving_ratiolist.append(moving_ratio)
+            ratiolist.append(ratio)
             
             
         except ValueError as e:
             print(e)
             continue 
             
-    return moving_fft_xlist, moving_ratiolist
+    return moving_fft_xlist, ratiolist
 
-def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, windowsize_ratio):
+def plot_meanratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
     '''
     dP_Ulimit > dP  を満たす全て事象の時系列データを加工し、
-    全ての「パワースペクトルとその移動平均の比(パワースペクトル比)」に対して
-    再度移動平均を取った結果(修正パワースペクトル)の平均を描画及び捕損ずる関数
+    全ての「パワースペクトルとその移動平均の比(パワースペクトル比)」の平均を描画及び保存する関数
     横軸:周波数(Hz) 縦軸:スペクトル強度の比
     
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
@@ -98,13 +94,13 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
 
     try:
         #対応する全事象のパワースペクトルとその移動平均の比を（修正)リスト化したものを導出
-        moving_fft_xlist, moving_ratiolist = process_movingratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT, windowsize_ratio)
-        if not moving_fft_xlist or not moving_ratiolist:
+        moving_fft_xlist, ratiolist = process_ratiolist_dP(dP_Ulimit, timerange, interval, windowsize_FFT)
+        if not moving_fft_xlist or not ratiolist:
             raise ValueError("No data")
         
         #修正パワースペクトルのケース平均の導出
         moving_fft_x = meanmovingFFT_sorteddP.process_arrays(moving_fft_xlist, np.nanmean)
-        moving_ratio =  meanmovingFFT_sorteddP.process_arrays(moving_ratiolist, np.nanmean)
+        ratio =  meanmovingFFT_sorteddP.process_arrays(ratiolist, np.nanmean)
         
         #特定の周波数より高周波の情報をnanに変更
         #moving_fft_x, moving_ratio = nearratio.filter_xUlimit(moving_fft_x, moving_ratio, 0.8)
@@ -115,9 +111,9 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
         
         #プロットの設定
         plt.xscale('log')
-        plt.plot(moving_fft_x, moving_ratio, label='moving ratio')
+        plt.plot(moving_fft_x, ratio, label='moving ratio')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'MMPS_dP >{-dP_Ulimit},time_range={timerange}s', fontsize=15)
+        plt.title(f'MPSR_dP >{-dP_Ulimit},time_range={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel('Pressure Amplitude Ratio', fontsize=15)
         plt.grid(True)
@@ -125,14 +121,14 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanmovingratio_dP_{timerange}s_windowsize_FFT={windowsize_FFT}'
+        output_dir = f'meanratio_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"dP is More{-dP_Ulimit},windowsize_ratio={windowsize_ratio}.png"))
+        plt.savefig(os.path.join(output_dir, f"dP is More{-dP_Ulimit},windowsize_FFT={windowsize_FFT}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed:dP is More{-dP_Ulimit},windowsize_ratio={windowsize_ratio}.png")
+        print(f"Save completed:dP is More{-dP_Ulimit},windowsize_FFT={windowsize_FFT}.png")
         
-        return moving_fft_x, moving_ratio
+        return moving_fft_x, ratio
 
     except ValueError as e:
         print(f"An error occurred: {e}")
@@ -144,7 +140,5 @@ if __name__ == "__main__":
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
     parser.add_argument('windowsize_FFT', type=int, 
                         help="The [windowsize] used to calculate the moving average of FFT") #パワースペクトルの移動平均を計算する際の窓数の指定
-    parser.add_argument('windowsize_ratio', type=int, 
-                        help="The [windowsize] used to calculate the moving average of ratio") #パワースペクトルとその移動平均の比の移動平均を計算する際の窓数の指定
     args = parser.parse_args()
-    plot_meanmovingratio_dP(args.dP_Ulimit, args.timerange, 20, args.windowsize_FFT, args.windowsize_ratio)
+    plot_meanratio_dP(args.dP_Ulimit, args.timerange, 20, args.windowsize_FFT)
