@@ -6,9 +6,9 @@ import focuschange_p
 import nodevil
 from tqdm import tqdm
 import nearFFT
-import Dispersion_Relation
 import meanFFT_sortedseason
 import meanmovingFFT_sorteddP
+from Dispersion_Relation import Params
 
 def process_focusFFTlist(MUTC_h, timerange):
     '''
@@ -72,7 +72,8 @@ def plot_focusmeanFFT(MUTC_h, timerange):
         fft_y = meanmovingFFT_sorteddP.process_arrays(fft_ylist, np.nanmean)
         
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #プロットの設定
         plt.xscale('log')

@@ -7,9 +7,10 @@ import nodevil
 from tqdm import tqdm
 import nearFFT
 import nearmovingFFT
-import Dispersion_Relation
+import nearratio
 import meanFFT_sortedseason
 import meanmovingFFT_sorteddP
+from Dispersion_Relation import Params
 
 def process_focusratiolist(MUTC_h, timerange, windowsize_FFT):
     '''
@@ -45,13 +46,13 @@ def process_focusratiolist(MUTC_h, timerange, windowsize_FFT):
         '''
         
         #パワースペクトルの導出
-        _, fft_y = nearFFT.FFT(focus_data)
+        fft_x, fft_y = nearFFT.FFT(focus_data)
             
         #パワースペクトルとその移動平均の導出
-        _, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(focus_data, windowsize_FFT)
+        fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(focus_data, windowsize_FFT)
 
         #比の算出
-        ratio = fft_y/moving_fft_y
+        moving_fft_x, ratio = nearratio.calculate_ratio(fft_x, fft_y, moving_fft_y, windowsize_FFT)
             
         #記録用配列に保存
         moving_fft_xlist.append(moving_fft_x)
@@ -81,13 +82,14 @@ def plot_focusmeanratio(MUTC_h, timerange, windowsize_FFT):
         ratio = meanmovingFFT_sorteddP.process_arrays(ratio_list, np.nanmean)
         
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #プロットの設定
         plt.xscale('log')
         plt.plot(moving_fft_x, ratio, label='ratio')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'MPSR_MUTC={MUTC_h}~{timerange}s')
+        plt.title(f'MPSR_MUTC={MUTC_h}:00~{timerange}s')
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Amplitude Ratio', fontsize=15)
         plt.grid(True)
@@ -95,12 +97,12 @@ def plot_focusmeanratio(MUTC_h, timerange, windowsize_FFT):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanfocusmovingratio_MUTC={MUTC_h}~{timerange}s'
+        output_dir = f'meanfocusmovingratio,MUTC={MUTC_h}:00~'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanfocusmovingratio,windowsize_FFT={windowsize_FFT}.png"))
+        plt.savefig(os.path.join(output_dir, f"{timerange}s,windowsize_FFT={windowsize_FFT}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanfocusmovingratio,windowsize_FFT={windowsize_FFT}.png")
+        print(f"Save completed:{timerange}s,windowsize_FFT={windowsize_FFT}.png")
         
         return moving_fft_x, ratio
 
