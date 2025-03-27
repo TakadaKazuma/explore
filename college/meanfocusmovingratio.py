@@ -7,10 +7,11 @@ import nodevil
 from tqdm import tqdm
 import nearFFT
 import nearmovingFFT
+import nearratio
 import nearmovingratio
-import Dispersion_Relation
 import meanFFT_sortedseason
 import meanmovingFFT_sorteddP
+from Dispersion_Relation import Params
 
 def process_focusmovingratiolist(MUTC_h, timerange, windowsize_FFT, windowsize_ratio):
     '''
@@ -50,23 +51,21 @@ def process_focusmovingratiolist(MUTC_h, timerange, windowsize_FFT, windowsize_r
         '''
         
         #パワースペクトルの導出
-        _, fft_y = nearFFT.FFT(focus_data)
+        fft_x, fft_y = nearFFT.FFT(focus_data)
             
         #パワースペクトルとその移動平均の導出
-        _, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(focus_data, windowsize_FFT)
+        fft_x, fft_y, moving_fft_x, moving_fft_y = nearmovingFFT.moving_FFT(focus_data, windowsize_FFT)
 
         #比の算出
-        ratio = fft_y/moving_fft_y
+        moving_fft_x, ratio = nearratio.calculate_ratio(fft_x, fft_y, moving_fft_y, windowsize_FFT)
         
         #比の移動平均を算出
-        moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, windowsize_ratio)
-        moving_ratio = nearmovingratio.calculate_movingave(ratio, windowsize_ratio)
+        moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, moving_ratio, windowsize_ratio)
             
         #記録用配列に保存
         moving_fft_xlist.append(moving_fft_x) 
         moving_ratiolist.append(moving_ratio)
-          
-            
+           
     return moving_fft_xlist, moving_ratiolist
 
 def plot_focusmeanmovingratio(MUTC_h, timerange, windowsize_FFT, windowsize_ratio):
@@ -91,8 +90,12 @@ def plot_focusmeanmovingratio(MUTC_h, timerange, windowsize_FFT, windowsize_rati
         moving_fft_x =  meanmovingFFT_sorteddP.process_arrays(moving_fft_xlist, np.nanmean)
         moving_ratio = meanmovingFFT_sorteddP.process_arrays(moving_ratiolist, np.nanmean)
         
+        #特定の周波数より高周波の情報をnanに変更
+        #moving_fft_x, moving_ratio = nearratio.filter_xUlimit(moving_fft_x, moving_ratio, 0.8)
+        
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #プロットの設定
         plt.xscale('log')
@@ -106,12 +109,12 @@ def plot_focusmeanmovingratio(MUTC_h, timerange, windowsize_FFT, windowsize_rati
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanfocustwicemovingratio__({MUTC_h}~{timerange}s_windowsize_FFT={windowsize_FFT})'
+        output_dir = f'meanfocustwicemovingratio,MUTC={MUTC_h}:00~_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanfocustwicemovingratio_windowsize_ratio={windowsize_ratio}.png"))
+        plt.savefig(os.path.join(output_dir, f"{timerange}s_windowsize_ratio={windowsize_ratio}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanfocustwicemovingratio_windowsize_ratio={windowsize_ratio}.png")
+        print(f"Save completed:{timerange}s_windowsize_ratio={windowsize_ratio}.png")
         
         return moving_fft_x, moving_ratio
 

@@ -7,9 +7,9 @@ import nodevil
 from tqdm import tqdm
 import nearFFT
 import nearmovingFFT
-import Dispersion_Relation
 import meanFFT_sortedseason
 import meanmovingFFT_sorteddP
+from Dispersion_Relation import Params
 
 def process_focusmovingFFTlist(MUTC_h, timerange, windowsize_FFT):
     '''
@@ -81,7 +81,8 @@ def plot_focusmeanmovingFFT(MUTC_h, timerange, windowsize_FFT):
         moving_fft_y = meanmovingFFT_sorteddP.process_arrays(moving_fft_ylist, np.nanmean)
         
         #音波と重力波の境界に該当する周波数
-        w = Dispersion_Relation.border_Hz()
+        params = Params()
+        w = params.border_Hz()
         
         #プロットの設定
         plt.xscale('log')
@@ -89,7 +90,7 @@ def plot_focusmeanmovingFFT(MUTC_h, timerange, windowsize_FFT):
         plt.plot(fft_x, fft_y, label='FFT')    
         plt.plot(moving_fft_x, moving_fft_y, label='FFT_Movingmean')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'MPS_MUTC={MUTC_h}~{timerange}s')
+        plt.title(f'MPS_MUTC={MUTC_h}:00~{timerange}s')
         plt.xlabel('Vibration Frequency [Hz]')
         plt.ylabel(f'Pressure Power [$Pa^2$]')
         plt.grid(True)
@@ -97,12 +98,12 @@ def plot_focusmeanmovingFFT(MUTC_h, timerange, windowsize_FFT):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanfocusmovingFFT_MUTC={MUTC_h}~{timerange}s'
+        output_dir = f'meanfocusmovingFFT_MUTC={MUTC_h}:00~'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"meanfocusmovingFFT,windowsize_FFT={windowsize_FFT}.png"))
+        plt.savefig(os.path.join(output_dir, f"{timerange}s,windowsize_FFT={windowsize_FFT}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: meanfocusmovingFFT,windowsize_FFT={windowsize_FFT}.png")
+        print(f"Save completed:{timerange}s.png")
         
         return moving_fft_x, moving_fft_y
 
