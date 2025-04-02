@@ -23,9 +23,9 @@ nearmovingFFT_*s_windowsize*
 
 nearratio_*s_windowsize*
 
-nearmovingratio_*s_windowsize
+nearmovingratio_*s_windowsize*
 
-nearmovingresampleratio_*s_windowsize*
+nearmovingratioresample_*s_windowsize*
 
 focuschange_p,MUTC=*
 
@@ -39,17 +39,25 @@ focusmovingratio,MUTC=*_windowsize*
 
 #画像フォルダ(ケース平均)
 
-meanFFT_sortedseason_*s
+meanFFT_season_*s
 
-meanFFT_sortedATandWs_*s
+meanFFT_ATandWs_*s
 
-meanFFT_sorteddP_*s
+meanFFT_dP_*s
 
 meanmovingFFT_dP_*s
 
 meanratio_dp_*s
 
 meanmovingratio_dP_*s_windowsize*
+
+meanfocusFFT,MUTC=*
+
+meanfocusmovingFFT,MUTC=*_windowsize*
+
+meanfocusratio,MUTC=*_windowsize*
+
+meanfocusmovingratio,MUTC=*_windowsize*
 
 #ログテキストファイル
 Errorlog*.txt

@@ -89,7 +89,7 @@ def plot_focusmeanFFT(MUTC_h, timerange):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanfocusFFT_MUTC={MUTC_h}:00~'
+        output_dir = f'meanfocusFFT,MUTC={MUTC_h}:00~'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"{timerange}s.png"))
         plt.clf()

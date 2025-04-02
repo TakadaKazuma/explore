@@ -91,13 +91,13 @@ def plot_focusmeanratio(MUTC_h, timerange, windowsize_FFT):
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'MPSR_MUTC={MUTC_h}:00~{timerange}s')
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
-        plt.ylabel(f'Pressure Amplitude Ratio', fontsize=15)
+        plt.ylabel('Pressure Amplitude Ratio', fontsize=15)
         plt.grid(True)
         plt.legend(fontsize=15)
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanfocusmovingratio,MUTC={MUTC_h}:00~'
+        output_dir = f'meanfocusratio,MUTC={MUTC_h}:00~'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"{timerange}s,windowsize_FFT={windowsize_FFT}.png"))
         plt.clf()

@@ -167,7 +167,7 @@ def plot_meanFFT_season(ls, timerange, interval):
         plt.tight_layout()
         
         # 保存の設定
-        output_dir = f'meanFFT_sortedseason_{timerange}s'
+        output_dir = f'meanFFT_season_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"ls is More{str(LS).zfill(3)} and less{str(LS+30).zfill(3)}.png"))
         plt.clf()
