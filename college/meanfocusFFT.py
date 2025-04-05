@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import argparse as argparse
+import dailychange_p
 import focuschange_p
 import nodevil
 from tqdm import tqdm
@@ -26,8 +27,13 @@ def process_focusFFTlist(MUTC_h, timerange):
     nodevilsollist = nodevil.process_nodevilsollist() 
     
     for sol in tqdm(nodevilsollist, desc="Processing nodevil sol"):
-        #該当する時系列データの取得
-        focus_data = focuschange_p.process_focusdata_p(sol, MUTC_h, timerange)
+        #該当sol付近の時系列データを取得
+        data = dailychange_p.process_surround_dailydata(sol)
+        if data is None or data.empty:
+            continue
+        
+        #該当範囲の抽出
+        focus_data = focuschange_p.filter_focusdata(data, sol, MUTC_h, timerange)
         if focus_data is None or focus_data.empty:
             continue
 
@@ -39,8 +45,8 @@ def process_focusFFTlist(MUTC_h, timerange):
         「countdown」、「p-pred」、「residual」カラムの追加
         countdown:経過時間(秒) ※countdown ≦ 0
         p-pred:線形回帰の結果(気圧(Pa))
-        residual:残差
-         '''
+        residual:残差 (Pa)
+        '''
         
         #パワースペクトルの導出
         fft_x, fft_y = nearFFT.FFT(focus_data)

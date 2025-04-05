@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import argparse as argparse
+import dailychange_p
 import focuschange_p
 import nodevil
 from tqdm import tqdm
@@ -34,20 +35,24 @@ def process_focusmovingratiolist(MUTC_h, timerange, windowsize_FFT, windowsize_r
     nodevilsollist = nodevil.process_nodevilsollist()
 
     for sol in tqdm(nodevilsollist, desc="Processing nodevil sol"):
-        #該当する時系列データの取得
-        focus_data = focuschange_p.process_focusdata_p(sol, MUTC_h, timerange)
+        #該当sol付近の時系列データを取得
+        data = dailychange_p.process_surround_dailydata(sol)
+        if data is None or data.empty:
+            continue
+        
+        #該当範囲の抽出
+        focus_data = focuschange_p.filter_focusdata(data, sol, MUTC_h, timerange)
         if focus_data is None or focus_data.empty:
             continue
 
         #加工済みデータを0.5秒でresample      
         focus_data = meanFFT_sortedseason.data_resample(focus_data, 0.5)
-
         focus_data = nearFFT.calculate_residual(focus_data)
         '''
         「countdown」、「p-pred」、「residual」カラムの追加
         countdown:経過時間(秒) ※countdown ≦ 0
         p-pred:線形回帰の結果(気圧(Pa))
-        residual:残差
+        residual:残差 (Pa)
         '''
         
         #パワースペクトルの導出
@@ -60,7 +65,7 @@ def process_focusmovingratiolist(MUTC_h, timerange, windowsize_FFT, windowsize_r
         moving_fft_x, ratio = nearratio.calculate_ratio(fft_x, fft_y, moving_fft_y, windowsize_FFT)
         
         #比の移動平均を算出
-        moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, moving_ratio, windowsize_ratio)
+        moving_fft_x, moving_ratio = nearmovingratio.calculate_movingave(moving_fft_x, ratio, windowsize_ratio)
             
         #記録用配列に保存
         moving_fft_xlist.append(moving_fft_x) 
