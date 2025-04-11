@@ -133,7 +133,7 @@ def plot_movingFFT(ID, timerange, interval, windowsize_FFT):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'nearmovingFFT_{timerange}s_windowsize={windowsize_FFT}'
+        output_dir = f'nearmovingFFT_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}.png"))
         plt.clf()

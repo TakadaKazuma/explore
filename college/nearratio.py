@@ -125,7 +125,7 @@ def plot_ratio(ID, timerange, interval, windowsize_FFT):
         plt.axvline(x=w, color='r', label='Border')
         plt.title(f'PSR_ID={ID}, sol={sol}, timerange={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
-        plt.ylabel(f'Pressure Power Ratio', fontsize=15)
+        plt.ylabel('Pressure Power Ratio', fontsize=15)
         plt.grid(True)
         plt.legend(fontsize=15)
         plt.tight_layout()

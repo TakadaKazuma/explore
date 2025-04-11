@@ -120,7 +120,7 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanFFT_sortedATandWs_{timerange}s'
+        output_dir = f'meanFFT_ATandWs_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"AT is More{AT_Llimit},Ws is less{Ws_Ulimit}.png"))
         plt.clf()

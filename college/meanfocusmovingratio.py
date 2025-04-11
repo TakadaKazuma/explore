@@ -114,7 +114,7 @@ def plot_focusmeanmovingratio(MUTC_h, timerange, windowsize_FFT, windowsize_rati
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanfocustwicemovingratio,MUTC={MUTC_h}:00~_windowsize_FFT={windowsize_FFT}'
+        output_dir = f'meanfocumovingratio,MUTC={MUTC_h}:00~_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"{timerange}s_windowsize_ratio={windowsize_ratio}.png"))
         plt.clf()

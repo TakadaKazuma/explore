@@ -79,7 +79,7 @@ def plot_focusmovingratio_resample(sol, MUTC_h, timerange, windowsize_FFT, windo
         plt.axvline(x=w, color='r', label='border')
         plt.title(f'PSR_sol={sol}, MUTC={MUTC_h}:00~{timerange}s')
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
-        plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
+        plt.ylabel(f'Pressure Power Ratio', fontsize=15)
         plt.grid(True)
         plt.legend(fontsize=15)
         plt.tight_layout()

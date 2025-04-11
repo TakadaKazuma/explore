@@ -104,7 +104,7 @@ def plot_focusmeanmovingFFT(MUTC_h, timerange, windowsize_FFT):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanfocusmovingFFT_MUTC={MUTC_h}:00~'
+        output_dir = f'meanfocusmovingFFT,MUTC={MUTC_h}:00~'
         os.makedirs(output_dir, exist_ok=True)
         plt.savefig(os.path.join(output_dir, f"{timerange}s,windowsize_FFT={windowsize_FFT}.png"))
         plt.clf()
