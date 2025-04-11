@@ -127,10 +127,10 @@ def plot_meanmovingratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT, wind
         #保存の設定
         output_dir = f'meanmovingratio_dP_{timerange}s_windowsize_FFT={windowsize_FFT}'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"dP is More{-dP_Ulimit},windowsize_ratio={windowsize_ratio}.png"))
+        plt.savefig(os.path.join(output_dir, f"dP is More {-dP_Ulimit},windowsize_ratio={windowsize_ratio}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed:dP is More{-dP_Ulimit},windowsize_ratio={windowsize_ratio}.png")
+        print(f"Save completed:dP is More {-dP_Ulimit},windowsize_ratio={windowsize_ratio}.png")
         
         return moving_fft_x, moving_ratio
 

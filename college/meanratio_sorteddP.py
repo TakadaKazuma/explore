@@ -123,10 +123,10 @@ def plot_meanratio_dP(dP_Ulimit, timerange, interval, windowsize_FFT):
         #保存の設定
         output_dir = f'meanratio_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"dP is More{-dP_Ulimit},windowsize_FFT={windowsize_FFT}.png"))
+        plt.savefig(os.path.join(output_dir, f"dP is More {-dP_Ulimit},windowsize_FFT={windowsize_FFT}.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed:dP is More{-dP_Ulimit},windowsize_FFT={windowsize_FFT}.png")
+        print(f"Save completed:dP is More {-dP_Ulimit},windowsize_FFT={windowsize_FFT}.png")
         
         return moving_fft_x, ratio
 
