@@ -8,7 +8,7 @@ def get_file_path(sol):
     '''
     指定されたsolに対応する、ファイルパスを作成する関数
     
-    sol:取り扱う火星日(探査機到着後からの経過日数)(int型)
+    sol : 取り扱う火星日(探査機到着後からの経過日数)(int型)
     '''
     directory = '/home/takada/2025B_takada/work/git/solall/'
     return os.path.join(directory, f'ps_calib_{str(sol).zfill(4)}.csv')
@@ -17,7 +17,7 @@ def load_data(file_pass):
     '''
     指定されたCSVファイルを読み込む関数
 
-    file_pass: 読み込むファイルのパス
+    file_pass : 読み込むファイルのパス
     '''
     try:
         data = pd.read_csv(file_pass, skiprows=1, usecols=[0, 1, 2, 3, 4], 
@@ -38,7 +38,7 @@ def process_dailydata_p(sol):
     - `MUTC`（火星協定時）で重複データを削除
     - `Local Time`（火星地方時刻）を追加
 
-    sol: 取り扱う火星日 (探査機到着後からの経過日数) (int型)
+    sol : 取り扱う火星日 (探査機到着後からの経過日数) (int型)
     '''
     # sol-1, sol, sol+1 に対応するデータを取得
     dataframes = [load_data(get_file_path(sol_offset)) for sol_offset in [sol - 1, sol, sol + 1]]
@@ -69,7 +69,7 @@ def process_surround_dailydata(sol):
     - データを結合し、`MUTC`（火星協定時）で重複を削除
     - `Local Time`（火星地方時刻）を追加
 
-    sol: 取り扱う火星日 (探査機到着後からの経過日数) (int型)
+    sol : 取り扱う火星日 (探査機到着後からの経過日数) (int型)
     '''
     # sol-1, sol, sol+1 に対応する全データを取得
     dataframes = [load_data(get_file_path(sol_offset)) for sol_offset in [sol - 1, sol, sol + 1]]
@@ -95,7 +95,7 @@ def plot_dailychange_p(sol):
     - `Local Time` (火星地方時刻) を横軸、`p` (気圧) を縦軸にプロット
     - プロット画像を `dailychange_p` フォルダに保存
 
-    sol: 取り扱う火星日 (探査機到着後からの経過日数) (int型)
+    sol : 取り扱う火星日 (探査機到着後からの経過日数) (int型)
     '''
     try:
         # データの取得

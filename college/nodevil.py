@@ -9,7 +9,7 @@ def ondevil_sols():
 
 def nodevil_sols():
     '''
-    ダストデビルが発生しなかったsolをリストとして返す関数
+    ダストデビルが発生しなかったsolのリストを返す関数
     '''
     # 全solが含まれる整数リストの作成
     all_sols = set(range(1219 + 1))

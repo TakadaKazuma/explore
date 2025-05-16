@@ -8,8 +8,9 @@ import nearFFT
 
 def get_sol_MUTC(ID):
     '''
-    ID(通し番号)に対応するsolとMUTCを取得する関数
-    ID:通し番号(datacatalog上でdustdevilに割り振られたもの)
+    ID (ダストデビルの識別番号)に対応するsolとMUTCを取得する関数
+    
+    ID : ダストデビルの識別番号
     '''
     datacatalog = DATACATALOG.process_datacatalog()
     sol = datacatalog.sol[ID]
@@ -18,13 +19,14 @@ def get_sol_MUTC(ID):
 
 def filter_neardevildata(data, MUTC, timerange, interval):
     '''
-    指定時刻 MUTC の (timerange + interval) 秒前 〜 interval 秒前の範囲で 
-    データを抽出し、DataFrameとして返す関数。
+    指定された時刻 MUTC (地方時) を基準に
+    (timerange + interval) 秒前 〜 interval 秒前
+    の範囲でデータを抽出する関数。
 
-    data: 気圧の時系列データ (DataFrame)
-    MUTC: Dust Devil 発生時刻 (datetime)
-    timerange: 切り取る時間範囲 (秒) (int)
-    interval: 開始オフセット (秒) (int)
+    data : 気圧の時系列データ (DataFrame)
+    MUTC : 火星地方時 (datetime)
+    timerange : 切り取る時間範囲 (秒) (int)
+    interval : 開始オフセット (秒) (int)
     '''
     stop = MUTC - datetime.timedelta(seconds=interval)
     start = stop - datetime.timedelta(seconds=timerange)
@@ -34,9 +36,9 @@ def filter_neardevildata(data, MUTC, timerange, interval):
 
 def calculate_countdown(data):
     '''
-    データに Dust Devil 発生までの秒数を示す "countdown" カラムを追加。
+    データにダストデビル発生までの秒数を示す "countdown" カラムを追加する関数。
 
-    data: フィルタリングされた気圧の時系列データ (DataFrame)
+    data : フィルタリングされた気圧の時系列データ (DataFrame)
     '''
     new_data = data.copy()
     
@@ -46,11 +48,12 @@ def calculate_countdown(data):
 
 def process_neardevildata(ID, timerange, interval):
     '''
-    指定 ID の Dust Devil 発生直前データを取得・処理し、時系列データを返す。
+    指定された ID に対応する MUTC (ダストデビル発生時刻)直前の
+    時系列データを取得・処理し、所定の形式で返す関数。
 
-    ID: ダストデビルの識別番号
-    timerange: 切り取る時間範囲 (秒) (int)
-    interval: 開始オフセット (秒) (int)
+    ID : ダストデビルの識別番号
+    timerange : 切り取る時間範囲 (秒) (int)
+    interval : 開始オフセット (秒) (int)
     '''
     try:
         # ID に対応する sol および MUTC を取得
@@ -83,21 +86,20 @@ def process_neardevildata(ID, timerange, interval):
 
 def plot_neardevil(ID, timerange, interval):
     '''
-    ID に対応する Dust Devil 発生直前の気圧時系列データと
-    線形回帰の結果をプロットし、画像を保存する。
+    ID に対応する MUTC (ダストデビル発生時刻)直前の
+    時系列データから気圧変化の線形回帰を算出し、
+    実際の気圧変化と重ねたプロットを保存する関数。
 
-    - X軸: countdown (s) [発生までの時間]
-    - Y軸: 気圧 (Pa)
+    - X軸 : countdown (s) [発生までの時間]
+    - Y軸 : 気圧 (Pa)
 
-    ID: ダストデビルの識別番号
-    timerange: 切り取る時間範囲 (秒) (int)
-    interval: 開始オフセット (秒) (int)
+    ID : ダストデビルの識別番号
+    timerange : 切り取る時間範囲 (秒) (int)
+    interval : 開始オフセット (秒) (int)
     '''   
     try:
         # 描画する時系列データの取得
         near_devildata, sol = process_neardevildata(ID, timerange, interval)
-        if near_devildata is None or near_devildata.empty:
-            raise ValueError("No data available.")
 
         # 描画の設定
         plt.plot(near_devildata['countdown'],near_devildata['p'],
@@ -114,7 +116,7 @@ def plot_neardevil(ID, timerange, interval):
         # 保存の設定
         output_dir = f'neardevil_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        filename = f"sol={str(sol).zfill(4)},ID={str(ID).zfill(5)}.png"
+        filename = f"ID={str(ID).zfill(5)}, sol={str(sol).zfill(4)}.png"
         plt.savefig(os.path.join(output_dir, filename))
         plt.clf()
         plt.close()

@@ -1,11 +1,12 @@
 import datetime
+import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import argparse as argparse
-import dailychange_p
-import nodevil
-import nearFFT
 from tqdm import tqdm
+import dailychange_p
+import nearFFT
+import nodevil
 
 def filter_focusdata(data, sol, MUTC_h, timerange):
     '''
@@ -83,7 +84,7 @@ def plot_focuschange_p(sol, MUTC_h, timerange):
         plt.savefig(os.path.join(output_dir,f"sol={str(sol).zfill(4)}_{timerange}s.png"))
         plt.clf()
         plt.close()
-        print(f"Save completed: sol={str(sol).zfill(4)}_{timerange}s.png")
+        print(f"Save completed:sol={str(sol).zfill(4)}_{timerange}s.png")
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -92,12 +93,12 @@ def plot_focuschange_p(sol, MUTC_h, timerange):
     return focus_data
     
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="plot focus pressure changes corresponding to the sol, LTST_h and timerange")
+    parser = argparse.ArgumentParser()
     parser.add_argument('MUTC_h', type=int, help='Base start time') #基準となる開始の時間
     parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
     
-    #ダストデビルが発生しなかったが、時系列データが存在するの気圧変化の描画
+    #ダストデビルの発生がない時間帯の気圧変化を描画
     nodevilsollist = nodevil.process_nodevilsollist()
     for sol in tqdm(nodevilsollist, desc="Processing nosdevil sols"):
         plot_focuschange_p(sol, args.MUTC_h, args.timerange)

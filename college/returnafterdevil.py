@@ -4,24 +4,9 @@ import os
 import argparse as argparse
 import dailychange_p
 import neardevil
+import afterdevil
 
-def filter_afterdevildata(data, MUTC, timerange, interval):
-    '''
-    指定時刻 MUTC の (interval) 秒後 ～ (interval+timerange) 秒後の範囲で、
-    データを抽出し、DataFrameとして返す関数。
-
-    data : 気圧の時系列データ (DataFrame)
-    MUTC : Dust Devil 発生時刻 (datetime)
-    timerange : 切り取る時間範囲 (秒) (int)
-    interval : 開始オフセット (秒) (int)
-    '''
-    start = MUTC + datetime.timedelta(seconds=interval)
-    stop = start + datetime.timedelta(seconds=timerange)
-    filtered_data = data.query('@start < MUTC < @stop').copy()
-    
-    return filtered_data
-
-def calculate_timecount(data):
+def calculate_returntimecount(data):
     '''
     データに Dust Devil 発生からの秒数を示す "timecount" カラムを追加。
 
@@ -29,12 +14,12 @@ def calculate_timecount(data):
     '''
     new_data = data.copy()
     
-    new_data["timecount"] = (new_data['MUTC'] - new_data['MUTC'].iloc[0]).dt.total_seconds()
+    new_data["timecount"] =  - (new_data['MUTC'].iloc[-1] - new_data['MUTC']).dt.total_seconds()
 
     
     return new_data
 
-def process_afterdevildata(ID, timerange, interval):
+def process_returnafterdevildata(ID, timerange, interval):
     '''
     指定 ID の Dust Devil 発生直後データを取得・処理し、時系列データを返す。
 
@@ -52,11 +37,11 @@ def process_afterdevildata(ID, timerange, interval):
             raise ValueError("Failed to retrieve time-series data.")
         
         # MUTC 付近のデータを抽出
-        after_devildata = filter_afterdevildata(data, MUTC, timerange, interval)
+        after_devildata = afterdevil.filter_afterdevildata(data, MUTC, timerange, interval)
         if after_devildata is None  or after_devildata.empty:
             raise ValueError("No data available after filtering.")
         
-        after_devildata = calculate_timecount(after_devildata)
+        after_devildata = calculate_returntimecount(after_devildata)
         '''
         追加カラム:
         - timecount: 経過時間 (秒) (timecount ≧ 0)
@@ -70,7 +55,7 @@ def process_afterdevildata(ID, timerange, interval):
         print(f"An error occurred: {e}")
         return None
 
-def plot_afterdevil(ID, timerange, interval):
+def plot_returnafterdevil(ID, timerange, interval):
     '''
     ID に対応する Dust Devil 発生直前の気圧時系列データと
     線形回帰の結果をプロットし、画像を保存する。
@@ -84,7 +69,7 @@ def plot_afterdevil(ID, timerange, interval):
     '''   
     try:
         # 描画する時系列データの取得
-        after_devildata, sol = process_afterdevildata(ID, timerange, interval)
+        after_devildata, sol = process_returnafterdevildata(ID, timerange, interval)
 
         # 描画の設定
         plt.plot(after_devildata['timecount'],after_devildata['p'],
@@ -99,7 +84,7 @@ def plot_afterdevil(ID, timerange, interval):
         plt.tight_layout()
         
         # 保存の設定
-        output_dir = f'afterdevil_{timerange}s'
+        output_dir = f'returnafterdevil_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
         filename = f"ID={str(ID).zfill(5)}, sol={str(sol).zfill(4)}.png"
         plt.savefig(os.path.join(output_dir, filename))
@@ -118,4 +103,4 @@ if __name__ == "__main__":
     parser.add_argument('ID', type=int, help="ID") #IDの指定
     parser.add_argument('timerange', type=int, help='timerange(s)') #時間間隔(切り出す時間)の指定(秒)
     args = parser.parse_args()
-    plot_afterdevil(args.ID, args.timerange, 20)
+    plot_returnafterdevil(args.ID, args.timerange, 20)
