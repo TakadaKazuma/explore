@@ -13,75 +13,77 @@ from Dispersion_Relation import Params
 
 def process_focusFFTlist(MUTC_h, timerange):
     '''
-    ダストデビルが1つも発生していない火星日のうち、
-    MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを全て加工し、
-    全てのパワースペクトルを列挙したリストを返す関数
+    ダストデビルの発生がない sol (火星日)におけるMUTC_h (地方時) 直後の
+    時系列データにおける気圧残差を求め、
+    各ケースのパワースペクトルをまとめたリストを返す関数。
 
-    MUTC_h:基準となる開始時刻(int型)(0 ≦ MUTC_h ≦ 23)
-    timerange:時間間隔(切り出す時間)(秒)(int型)
+    MUTC_h : 火星地方時(0 ≦ MUTC_h ≦ 23)(int)
+    timerange : 切り取る時間範囲 (秒) (int)
     '''
-    #記録用配列の作成
+    # 記録用配列の作成
     fft_xlist, fft_ylist = [], []
 
-    #ダストデビルの発生がないsolのリストを作成
+    # ダストデビルの発生がない sol のリストを作成
     nodevilsollist = nodevil.process_nodevilsollist() 
     
     for sol in tqdm(nodevilsollist, desc="Processing nodevil sol"):
-        #該当sol付近の時系列データを取得
+        
+        # 該当 sol に対応する時系列データの取得
         data = dailychange_p.process_surround_dailydata(sol)
         if data is None or data.empty:
             continue
         
-        #該当範囲の抽出
+        # 該当 sol 及び MUTC_h に対応する時系列データの取得
         focus_data = focuschange_p.filter_focusdata(data, sol, MUTC_h, timerange)
         if focus_data is None or focus_data.empty:
             continue
 
-        #加工済みデータを0.5秒でresample      
+        # 0.5秒間隔でresample    
         focus_data = meanFFT_sortedseason.data_resample(focus_data, 0.5)
-
+                
+        # 残差計算を実施
         focus_data = nearFFT.calculate_residual(focus_data)
         '''
-        「countdown」、「p-pred」、「residual」カラムの追加
-        countdown:経過時間(秒) ※countdown ≦ 0
-        p-pred:線形回帰の結果(気圧(Pa))
-        residual:残差 (Pa)
+        追加カラム:
+        - countdown: 経過時間 (秒) (countdown ≦ 0)
+        - p-pred: 線形回帰による気圧予測値 (Pa)
+        - residual: 気圧の残差
         '''
         
-        #パワースペクトルの導出
+        # FFT によるパワースペクトルの導出
         fft_x, fft_y = nearFFT.FFT(focus_data)
 
-        #記録用配列に追加
+        # 結果を配列に記録
         fft_xlist.append(fft_x)
         fft_ylist.append(fft_y)
             
     return fft_xlist, fft_ylist
 
-def plot_focusmeanFFT(MUTC_h, timerange):
+def plot_meanfocusFFT(MUTC_h, timerange):
     '''
-    ダストデビルが1つも発生していない火星日のうち、
-    MUTC_h(時刻)からtimerange秒間に対応する気圧の時系列データを全て加工し、
-    パワースペクトルの平均を描画した画像を保存する関数。
-    横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
+    ダストデビルの発生がない sol (火星日)におけるMUTC_h (地方時) 直後の
+    時系列データにおける気圧残差を求め、
+    各ケースのパワースペクトルの平均を算出し、プロットを保存する関数。
 
-    MUTC_h:基準となる開始時刻(int型)(0 ≦ MUTC_h ≦ 23)
-    timerange:時間間隔(切り出す時間)(秒)(int型)
+    - X軸 : 振動数 (Hz)
+    - Y軸 : スペクトル強度 (Pa^2)
+
+    MUTC_h : 火星地方時(0 ≦ MUTC_h ≦ 23)(int)
+    timerange : 切り取る時間範囲 (秒) (int)
     '''
     try:
-        #対応する全事象のパワースペクトルをリスト化したものの導出
+        # 各ケースにおけるパワースペクトルをまとめたリストを導出
         fft_xlist, fft_ylist = process_focusFFTlist(MUTC_h, timerange)
-        if not fft_xlist or not fft_ylist:
-            raise ValueError("No data")
         
-        #パワースペクトルのケース平均を導出
+        # パワースペクトルのケース平均を導出
         fft_x = meanmovingFFT_sorteddP.process_arrays(fft_xlist, np.nanmean)
         fft_y = meanmovingFFT_sorteddP.process_arrays(fft_ylist, np.nanmean)
         
-        #音波と重力波の境界に該当する周波数
+        # 音波と重力波の境界に該当する周波数
         params = Params()
         w = params.border_Hz()
         
-        #プロットの設定
+        # プロットの設定
         plt.xscale('log')
         plt.yscale('log')
         plt.ylim(1e-6, 1e2)
@@ -95,12 +97,13 @@ def plot_focusmeanFFT(MUTC_h, timerange):
         plt.tight_layout()
         
         #保存の設定
-        output_dir = f'meanfocusFFT,MUTC={MUTC_h}:00~'
+        output_dir = f'meanfocusFFT_MUTC={MUTC_h}:00~'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"{timerange}s.png"))
+        filename = f"{timerange}s.png"
+        plt.savefig(os.path.join(output_dir, filename))
         plt.clf()
         plt.close()
-        print(f"Save completed:{timerange}s.png")
+        print(f"Save completed: {filename}")
         
         return fft_x, fft_y
 
@@ -108,8 +111,8 @@ def plot_focusmeanFFT(MUTC_h, timerange):
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the LTST_h and timerange") 
-    parser.add_argument('MUTC_h', type=int, help='Base start time') #基準となる開始の時間
-    parser.add_argument('timerange', type=int, help='timerange(s)') #時間間隔(切り出す時間)の指定(秒)
+    parser = argparse.ArgumentParser() 
+    parser.add_argument('MUTC_h', type=int, help='Base start time') # MUTC_h (火星地方時)の指定
+    parser.add_argument('timerange', type=int, help='timerang(s)') # 切り取る時間範囲(秒)
     args = parser.parse_args()
-    plot_focusmeanFFT(args.MUTC_h, args.timerange)
+    plot_meanfocusFFT(args.MUTC_h, args.timerange)
