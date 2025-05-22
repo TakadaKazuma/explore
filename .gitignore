@@ -44,12 +44,30 @@ meanFFT_dP_*s
 
 meanmovingFFT_dP_*s
 
-meanratio_dp_*s
+meanratio_dP_*s
 
 meanmovingratio_dP_*s_windowsize*
 
 #画像フォルダ(nearAS)
+nearAS_*s
 
+nearmovingAS_*s_windowsize*
+
+nearASratio_*s_windowsize*
+
+nearASmovingratio_*s_windowsize*
+
+nearASmovingratioresample_*s_windowsize*
+
+meanAS_dP_*s
+
+meanmovingAS_dP_*s
+
+meanASratio_dP_*s
+
+meanASmovingratio_dP_*s_windowsize*
+
+#画像フォルダ(focusFFT)
 focusFFT,MUTC=*
 
 focusmovingFFT,MUTC=*_windowsize*
