@@ -15,10 +15,10 @@ from Dispersion_Relation import Params
 
 def process_IDlist_ATandWs(AT_Llimit, Ws_Ulimit):
     '''
-    datacatalogから AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たすIDのリストを作成する関数
+    datacatalog から AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たすIDのリストを作成する関数
 
-    AT_Llimit:下限の基準となる大気の温度(K) (int型)
-    Ws_Ulimit:上限の基準となる風速(m/s) (int型)
+    AT_Llimit : 基準となる大気の温度(K) (int)
+    Ws_Ulimit : 基準となる風速(m/s) (int)
     '''
     datacatalog = DATACATALOG.process_datacatalog()
     filtered_list = datacatalog[(datacatalog['AT-ave'] > AT_Llimit)&(datacatalog['Ws-ave'] < Ws_Ulimit)]
@@ -27,51 +27,52 @@ def process_IDlist_ATandWs(AT_Llimit, Ws_Ulimit):
 
 def process_FFTlist_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
     '''
-    AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たすダストデビル全ての時系列データを加工し、
-    全てのパワースペクトルを列挙したリストを返す関数
+    AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たす全ての ID に対応する、
+    MUTC (ダストデビル発生時刻) 直前の時系列データにおける気圧残差を求め、
+    各ケースのパワースペクトルをまとめたリストを返す関数。
 
-    AT_Llimit:下限の基準となる大気の温度(K) (int型)
-    Ws_Ulimit:上限の基準となる風速(m/s) (int型)
-    timerange:時間間隔(切り出す時間)(秒)(int型)
-    interval:ラグ(何秒前から切り出すか)(秒)(int型)
+    AT_Llimit : 基準となる大気の温度(K) (int型)
+    Ws_Ulimit : 基準となる風速(m/s) (int型)
+    timerange : 切り取る時間範囲 (秒) (int)
+    interval : 開始オフセット (秒) (int)
     '''
 
-    #記録用配列の作成
+    # 記録用配列の作成
     fft_xlist, fft_ylist = [], []
 
-    #AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たすIDリストの作成
+    # AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たすIDをリスト化
     IDlist = process_IDlist_ATandWs(AT_Llimit, Ws_Ulimit)
     for ID in tqdm(IDlist, desc="Processing IDs"):
         try:
-            #IDに対応するsol及びMUTCを取得
+            # ID に対応する sol および MUTC を取得
             sol, MUTC = neardevil.get_sol_MUTC(ID)
 
             #該当sol付近の時系列データを取得
             data = dailychange_p.process_surround_dailydata(sol)
             if data is None:
-                raise ValueError("")
+                raise ValueError("Failed to retrieve time-series data.")
             
-            #該当範囲の抽出
+            # MUTC 付近の時系列データを取得
             near_devildata = neardevil.filter_neardevildata(data, MUTC, timerange, interval)
+            if near_devildata is None or near_devildata.empty:
+                raise ValueError("No data available after filtering.")
 
-            #加工済みデータを0.5秒でresample
+            #0.5秒間隔でresample
             near_devildata = meanFFT_sortedseason.data_resample(near_devildata, 0.5)
-            if near_devildata is None:
-                raise ValueError("No data")
-
-              
+                
+            # 残差計算を実施
             near_devildata = nearFFT.calculate_residual(near_devildata)
             '''
-            「countdown」、「p-pred」、「residual」カラムの追加
-            countdown:経過時間(秒) ※countdown ≦ 0
-            p-pred:線形回帰の結果(気圧(Pa))
-            residual:残差 (Pa)
+            追加カラム:
+            - countdown: 経過時間 (秒) (countdown ≦ 0)
+            - p-pred: 線形回帰による気圧予測値 (Pa)
+            - residual: 気圧の残差
             '''
 
-            #FFTの導出
+            # FFT によるパワースペクトルの導出
             fft_x, fft_y =  nearFFT.FFT(near_devildata)
 
-            #記録用配列に追加
+            # 結果を配列に記録
             fft_xlist.append(fft_x)
             fft_ylist.append(fft_y)
             
@@ -83,30 +84,31 @@ def process_FFTlist_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
 
 def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
     '''
-    AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たすダストデビル全ての時系列データを加工し、
-    パワースペクトルの平均を描画及び保存する関数
-    横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
+    AT-ave>AT_Llimit かつ Ws-ave<Ws_Ulimit を満たす全ての ID に対応する、
+    MUTC (ダストデビル発生時刻) 直前の時系列データにおける気圧残差を求め、
+    各ケースのパワースペクトルの平均を算出し、プロットを保存する関数。
 
-    AT_Llimit:下限の基準となる大気の温度(K) (int型)
-    Ws_Ulimit:上限の基準となる風速(m/s) (int型)
-    timerange:時間間隔(切り出す時間)(秒)(int型)
-    interval:ラグ(何秒前から切り出すか)(秒)(int型)
+    - X軸 : 振動数 (Hz)
+    - Y軸 : スペクトル強度 (Pa^2)
+
+    AT_Llimit : 基準となる大気の温度(K) (int型)
+    Ws_Ulimit : 基準となる風速(m/s) (int型)
+    timerange : 切り取る時間範囲 (秒) (int)
+    interval : 開始オフセット (秒) (int)
     '''
     try:
-        #対応する全事象のFFTをリスト化したものの導出
+        # 各ケースにおけるパワースペクトルをまとめたリストの導出
         fft_xlist, fft_ylist = process_FFTlist_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval)
-        if not fft_xlist or not fft_ylist:
-            raise ValueError("No data")
         
-        # FFTのケース平均を導出
+        # パワースペクトルのケース平均を導出
         fft_x = meanmovingFFT_sorteddP.process_arrays(fft_xlist, np.nanmean)
         fft_y = meanmovingFFT_sorteddP.process_arrays(fft_ylist, np.nanmean)
         
-        #音波と重力波の境界に該当する周波数
+        # 音波と重力波の境界に該当する周波数
         params = Params()
         w = params.border_Hz()
         
-        #プロットの設定
+        # プロットの設定
         plt.xscale('log')
         plt.yscale('log')
         plt.ylim(1e-6, 1e2)
@@ -119,13 +121,14 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
         plt.legend(fontsize=15)
         plt.tight_layout()
         
-        #保存の設定
-        output_dir = f'meanFFT_ATandWs_{timerange}s'
+        # 保存の設定
+        output_dir = f'meanFFT_sortedATandWs_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"AT is More{AT_Llimit},Ws is less{Ws_Ulimit}.png"))
+        filename = f"AT is More{AT_Llimit},Ws is less{Ws_Ulimit}.png"
+        plt.savefig(os.path.join(output_dir, filename))
         plt.clf()
         plt.close()
-        print(f"Save completed: AT is More{AT_Llimit},Ws is less{Ws_Ulimit}.png")
+        print(f"Save completed: {filename}")
         
         return fft_x, fft_y
 
@@ -133,11 +136,11 @@ def plot_meanFFT_ATandWs(AT_Llimit, Ws_Ulimit, timerange, interval):
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the AT_Ulimit and Ws_Llimit")
+    parser = argparse.ArgumentParser()
     parser.add_argument('AT_Ulimit', type=int, 
-                        help="Serves as the standard for the upper limit of AT_ave(K)") #AT_aveの上限の指定
+                        help="Serves as the standard for the upper limit of AT_ave(K)") # AT_aveの上限の指定
     parser.add_argument('Ws_Llimit', type=int, 
-                        help='Serves as the standard for the upper limit of Ws_ave(m/s)') #Ws_aveの下限の指定
-    parser.add_argument('timerange', type=int, help='timerang(s)') #時間範囲(切り出す時間)の指定
+                        help='Serves as the standard for the upper limit of Ws_ave(m/s)') # Ws_aveの下限の指定
+    parser.add_argument('timerange', type=int, help='timerang(s)') # り取る時間範囲(秒)
     args = parser.parse_args()
     plot_meanFFT_ATandWs(args.AT_Ulimit, args.Ws_Llimit, args.timerange, 20)

@@ -15,9 +15,9 @@ from Dispersion_Relation import Params
 
 def process_IDlist_dP(dP_Ulimit):
     '''
-    datacatalogから dP_Ulimit> dP を満たすIDのリストを作成する関数
+    datacatalog から dP_Ulimit> dP を満たす ID のリストを作成する関数
 
-    dP_Ulimit:上限となる気圧効果量(Pa) (int型)
+    dP_Ulimit : 基準となる気圧降下量(Pa) (int)
     ※dP, dP_max < 0
     '''
     datacatalog = DATACATALOG.process_datacatalog()
@@ -26,49 +26,51 @@ def process_IDlist_dP(dP_Ulimit):
 
 def process_FFTlist_dP(dP_Ulimit, timerange, interval):
     '''
-    dP_Ulimit > dP を満たすダストデビル全ての時系列データを加工し、
-    全てのパワースペクトルを列挙したリストを返す関数
+    dP_Ulimit > dP を満たす全ての ID に対応する、
+    MUTC (ダストデビル発生時刻) 直前の時系列データにおける気圧残差を求め、
+    各ケースのパワースペクトルをまとめたリストを返す関数。
 
-    dP_Ulimit:上限となる気圧降下量(Pa) (int型)
+    dP_Ulimit:上限となる気圧降下量(Pa) (int)
     ※dP, dP_Ulimit < 0
-    timerange:時間間隔(切り出す時間)(秒)(int型)
-    interval:ラグ(何秒前から切り出すか)(秒)(int型)
+    timerange : 切り取る時間範囲 (秒) (int)
+    interval : 開始オフセット (秒) (int)
     '''
-    #記録用配列の作成
+    # 記録用配列の作成
     fft_xlist, fft_ylist = [], []
 
-    #dP_Ulimit > dP を満たすIDリストの作成
+    # dP_Ulimit > dP を満たすIDをリスト化
     IDlist = process_IDlist_dP(dP_Ulimit)
     for ID in tqdm(IDlist, desc="Processing IDs"):
         try:
-            #IDに対応するsol及びMUTCを取得
+            # ID に対応する sol および MUTC を取得
             sol, MUTC = neardevil.get_sol_MUTC(ID)
 
-            #該当sol付近の時系列データを取得
+            # 該当sol付近の時系列データを取得
             data = dailychange_p.process_surround_dailydata(sol)
             if data is None:
-                raise ValueError("")
+                raise ValueError("Failed to retrieve time-series data.")
             
-            #該当範囲の抽出
+            # MUTC 付近の時系列データを取得
             near_devildata = neardevil.filter_neardevildata(data, MUTC, timerange, interval)
+            if near_devildata is None or near_devildata.empty:
+                raise ValueError("No data available after filtering.")
 
-            #加工済みデータを0.5秒でresample
+            # 0.5秒間隔でresample
             near_devildata = meanFFT_sortedseason.data_resample(near_devildata, 0.5)
-            if near_devildata is None:
-                raise ValueError("No data")
                 
+            # 残差計算を実施
             near_devildata = nearFFT.calculate_residual(near_devildata)
             '''
-            「countdown」、「p-pred」、「residual」カラムの追加
-            countdown:経過時間(秒) ※countdown ≦ 0
-            p-pred:線形回帰の結果(気圧(Pa))
-            residual:残差 (Pa)
+            追加カラム:
+            - countdown: 経過時間 (秒) (countdown ≦ 0)
+            - p-pred: 線形回帰による気圧予測値 (Pa)
+            - residual: 気圧の残差
             '''
 
-            #パワースペクトルの導出
+            # FFT によるパワースペクトルの導出
             fft_x, fft_y =  nearFFT.FFT(near_devildata)
 
-            #記録用配列に追加
+            # 結果を配列に記録
             fft_xlist.append(fft_x)
             fft_ylist.append(fft_y)
             
@@ -80,9 +82,12 @@ def process_FFTlist_dP(dP_Ulimit, timerange, interval):
 
 def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
     '''
-    dP_Ulimit > dP を満たすダストデビル全ての時系列データを加工し、
-    パワースペクトルの平均を描画及び保存する関数
-    横軸:周波数(Hz) 縦軸:スペクトル強度(Pa^2)
+    dP_Ulimit > dP を満たす全ての ID に対応する、
+    MUTC (ダストデビル発生時刻) 直前の時系列データにおける気圧残差を求め、
+    各ケースのパワースペクトルの平均を算出し、プロットを保存する関数。
+
+    - X軸 : 振動数 (Hz)
+    - Y軸 : スペクトル強度 (Pa^2)
 
     dP_Ulimit:上限となる気圧降下量(Pa) (int型)
     ※dP, dP_Ulimit < 0
@@ -90,39 +95,38 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
     interval:ラグ(何秒前から切り出すか)(秒)(int型)
     '''
     try:
-        #対応する全事象のパワースペクトルをリスト化したものの導出
+        # 各ケースにおけるパワースペクトルをまとめたリストの導出
         fft_xlist, fft_ylist = process_FFTlist_dP(dP_Ulimit, timerange, interval)
-        if not fft_xlist or not fft_ylist:
-            raise ValueError("No data")
         
-        #パワースペクトルのケース平均を導出
+        # パワースペクトルのケース平均を導出
         fft_x = meanmovingFFT_sorteddP.process_arrays(fft_xlist, np.nanmean)
         fft_y = meanmovingFFT_sorteddP.process_arrays(fft_ylist, np.nanmean)
         
-        #音波と重力波の境界に該当する周波数
+        # 音波と重力波の境界に該当する周波数
         params = Params()
         w = params.border_Hz()
         
-        #プロットの設定
+        # プロットの設定
         plt.xscale('log')
         plt.yscale('log')
         plt.ylim(1e-6, 1e2)
         plt.plot(fft_x, fft_y, label='FFT')
         plt.axvline(x=w, color='r', label='border')
-        plt.title(f'MPS_dP>{-dP_Ulimit}.timerange={timerange}s', fontsize=15)
+        plt.title(f'MPS_dP>{-dP_Ulimit},timerange={timerange}s', fontsize=15)
         plt.xlabel('Vibration Frequency [Hz]', fontsize=15)
         plt.ylabel(f'Pressure Power [$Pa^2$]', fontsize=15)
         plt.grid(True)
         plt.legend(fontsize=15)
         plt.tight_layout()
         
-        #保存の設定
+        # 保存の設定
         output_dir = f'meanFFT_dP_{timerange}s'
         os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f"dP is More {-dP_Ulimit}.png"))
+        filename = f"dP is More {-dP_Ulimit}.png"
+        plt.savefig(os.path.join(output_dir, filename))
         plt.clf()
         plt.close()
-        print(f"Save completed:dP is More {-dP_Ulimit}.png")
+        print(f"Save completed: {filename}")
         
         return fft_x, fft_y
 
@@ -130,9 +134,9 @@ def plot_meanFFT_dP(dP_Ulimit, timerange, interval):
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot the case average of the power spectrum corresponding to the dP_Ulimit") 
+    parser = argparse.ArgumentParser() 
     parser.add_argument('dP_Ulimit', type=int, 
-                        help="Serves as the standard for the upper limit of dP_ave(Negative int)") #dPの上限の指定(負)
-    parser.add_argument('timerange', type=int, help='timerang(s)') #時間間隔(切り出す時間)の指定(秒)
+                        help="Serves as the standard for the upper limit of dP_ave(Negative int)") # dPの上限の指定(負)
+    parser.add_argument('timerange', type=int, help='timerang(s)') # 切り取る時間範囲(秒)
     args = parser.parse_args()
     plot_meanFFT_dP(args.dP_Ulimit, args.timerange, 20)

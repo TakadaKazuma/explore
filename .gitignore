@@ -12,11 +12,20 @@ Dispersion_Relation.png
 #DATACATALOG原本
 InSight_CV_Catalog_v3.csv
 
-#画像フォルダ(個別ケース)
+#画像フォルダ(change_p)
 dailychange_p
 
 neardevil_*s
 
+ondevil_*s
+
+afterdevil_*s
+
+returnafterdevil_*s
+
+focuschange_p,MUTC=*
+
+#画像フォルダ(nearFFT)
 nearFFT_*s
 
 nearmovingFFT_*s_windowsize*
@@ -26,18 +35,6 @@ nearratio_*s_windowsize*
 nearmovingratio_*s_windowsize*
 
 nearmovingratioresample_*s_windowsize*
-
-focuschange_p,MUTC=*
-
-focusFFT,MUTC=*
-
-focusmovingFFT,MUTC=*_windowsize*
-
-focusratio,MUTC=*_windowsize*
-
-focusmovingratio,MUTC=*_windowsize*
-
-#画像フォルダ(ケース平均)
 
 meanFFT_season_*s
 
@@ -50,6 +47,17 @@ meanmovingFFT_dP_*s
 meanratio_dp_*s
 
 meanmovingratio_dP_*s_windowsize*
+
+#画像フォルダ(nearAS)
+
+focusFFT,MUTC=*
+
+focusmovingFFT,MUTC=*_windowsize*
+
+focusratio,MUTC=*_windowsize*
+
+focusmovingratio,MUTC=*_windowsize*
+
 
 meanfocusFFT,MUTC=*
 
