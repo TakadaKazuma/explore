@@ -89,6 +89,27 @@ meanASratio_dP_*s
 
 meanASmovingratio_dP_*s_windowsize*
 
+#画像フォルダ(afterAS)
+afterAS_*s
+
+afterASresample_*s
+
+aftermovingAS_*s_windowsize*
+
+afterASratio_*s_windowsize*
+
+afterASmovingratio_*s_windowsize*
+
+afterASmovingratioresample_*s_windowsize*
+
+meanafterAS_dP_*s
+
+meanaftermovingAS_dP_*s
+
+meanafterASratio_dP_*s
+
+meanafterASmovingratio_dP_*s_windowsize*
+
 #画像フォルダ(focusFFT)
 focusFFT,MUTC=*
 
