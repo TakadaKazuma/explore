@@ -48,8 +48,30 @@ meanratio_dP_*s
 
 meanmovingratio_dP_*s_windowsize*
 
+#画像フォルダ(nearFFT)
+afterFFT_*s
+
+aftermovingFFT_*s_windowsize*
+
+afterratio_*s_windowsize*
+
+aftermovingratio_*s_windowsize*
+
+aftermovingratioresample_*s_windowsize*
+
+
+meanafterFFT_dP_*s
+
+meanaftermovingFFT_dP_*s
+
+meanafterratio_dP_*s
+
+meanaftermovingratio_dP_*s_windowsize*
+
 #画像フォルダ(nearAS)
 nearAS_*s
+
+nearASresample_*s
 
 nearmovingAS_*s_windowsize*
 
